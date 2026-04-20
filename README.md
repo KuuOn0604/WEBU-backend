@@ -1,74 +1,95 @@
-<p align="center">
-  <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
-</p>
+# W.E.B.U - Web Engineering of Bachkhoa Univeristy
 
-[circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
-[circleci-url]: https://circleci.com/gh/nestjs/nest
+**Personalized Code Learning Platform** — Backend application built with NestJS + TypeScript
 
-  <p align="center">A progressive <a href="http://nodejs.org" target="_blank">Node.js</a> framework for building efficient and scalable server-side applications.</p>
-    <p align="center">
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/v/@nestjs/core.svg" alt="NPM Version" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/l/@nestjs/core.svg" alt="Package License" /></a>
-<a href="https://www.npmjs.com/~nestjscore" target="_blank"><img src="https://img.shields.io/npm/dm/@nestjs/common.svg" alt="NPM Downloads" /></a>
-<a href="https://circleci.com/gh/nestjs/nest" target="_blank"><img src="https://img.shields.io/circleci/build/github/nestjs/nest/master" alt="CircleCI" /></a>
-<a href="https://discord.gg/G7Qnnhy" target="_blank"><img src="https://img.shields.io/badge/discord-online-brightgreen.svg" alt="Discord"/></a>
-<a href="https://opencollective.com/nest#backer" target="_blank"><img src="https://opencollective.com/nest/backers/badge.svg" alt="Backers on Open Collective" /></a>
-<a href="https://opencollective.com/nest#sponsor" target="_blank"><img src="https://opencollective.com/nest/sponsors/badge.svg" alt="Sponsors on Open Collective" /></a>
-  <a href="https://paypal.me/kamilmysliwiec" target="_blank"><img src="https://img.shields.io/badge/Donate-PayPal-ff3f59.svg" alt="Donate us"/></a>
-    <a href="https://opencollective.com/nest#sponsor"  target="_blank"><img src="https://img.shields.io/badge/Support%20us-Open%20Collective-41B883.svg" alt="Support us"></a>
-  <a href="https://twitter.com/nestframework" target="_blank"><img src="https://img.shields.io/twitter/follow/nestframework.svg?style=social&label=Follow" alt="Follow us on Twitter"></a>
-</p>
-  <!--[![Backers on Open Collective](https://opencollective.com/nest/backers/badge.svg)](https://opencollective.com/nest#backer)
-  [![Sponsors on Open Collective](https://opencollective.com/nest/sponsors/badge.svg)](https://opencollective.com/nest#sponsor)-->
+## 🚀 Tech Stack
 
-## Description
+- **Framework:** [NestJS](https://nestjs.com/) + [TypeScript](https://www.typescriptlang.org/)
+- **Runtime:** Node.js v20
+- **Package Manager:** Yarn
+- **Code quality:** ESLint (flat config) + Prettier + Husky + lint-staged
+- **CI:** GitHub Actions
 
-[Nest](https://github.com/nestjs/nest) framework TypeScript starter repository.
+## 📋 Prerequisitesx
 
-## Project setup
+- Node.js `>= 20`
+- Yarn `>= 1.22` (or npm/pnpm — adjust commands accordingly)
+
+## 🛠 Getting Started
 
 ```bash
-$ yarn install
+# 1. Clone the repo
+git clone <your-repo-url>
+cd webu-backend
+
+# 2. Install dependencies (strictly follow yarn.lock)
+yarn install --frozen-lockfile
+
+# 3. Initialize Husky hooks (runs automatically via "prepare" script)
+yarn prepare
+
+# 4. Start dev server in watch mode
+yarn start:dev
 ```
 
-## Compile and run the project
+The API will be available at **http://localhost:3000**.
 
-```bash
-# development
-$ yarn run start
+## 📜 Available Scripts
 
-# watch mode
-$ yarn run start:dev
+| Command             | Description                                    |
+| ------------------- | ---------------------------------------------- |
+| `yarn start:dev`    | Start NestJS dev server with watch mode        |
+| `yarn build`        | Compile TypeScript into dist/ folder           |
+| `yarn start`:prod   | Run the compiled production build              |
+| `yarn lint`         | Run ESLint to catch syntax & logic issues      |
+| `yarn lint:fix`     | Run ESLint and auto-fix import & format issues |
+| `yarn format`       | Format all files with Prettier                 |
+| `yarn format:check` | Check formatting without writing (used in CI)  |
+| `yarn test`         | Run unit tests with Jest                       |
+| `yarn test:e2e`     | Run end-to-end tests                           |
 
-# production mode
-$ yarn run start:prod
+## 📁 Project Structure
+
+```
+webu-backend/
+├── .github/workflows/    # GitHub Actions CI (Lint, Format, Build, Test)
+├── .husky/               # Git hooks (pre-commit -> yarn lint)
+├── src/
+│   ├── common/           # Shared guards, interceptors, constants, decorators
+│   ├── config/           # Environment variables and app configurations
+│   ├── modules/          # Feature modules (Auth, User, etc.)
+│   │   └── user/
+│   │       ├── dto/                  # Data Transfer Objects
+│   │       ├── user.controller.ts    # API Endpoints
+│   │       ├── user.service.ts       # Business Logic
+│   │       └── user.module.ts        # Module Encapsulation
+│   ├── app.module.ts     # Root module
+│   └── main.ts           # App entry point
+├── eslint.config.mjs     # ESLint flat config (Strict Naming & Type Rules)
+├── .prettierrc           # Prettier config
+├── nest-cli.json         # NestJS CLI configuration
+└── tsconfig.json         # TypeScript configurations
 ```
 
-## Run tests
+## ⚠️ Coding Conventions & Rules
 
-```bash
-# unit tests
-$ yarn run test
+Our project enforces strict coding guidelines to maintain clean code:
 
-# e2e tests
-$ yarn run test:e2e
+Naming Convention: All folders and files inside src/ MUST use kebab-case (e.g., user-profile.controller.ts).
 
-# test coverage
-$ yarn run test:cov
-```
+Imports: Imports are automatically sorted and grouped. Unused imports will cause a lint error.
 
-## Deployment
+Strict Types: Avoid using any. Utilize proper DTOs and Interfaces.
 
-When you're ready to deploy your NestJS application to production, there are some key steps you can take to ensure it runs as efficiently as possible. Check out the [deployment documentation](https://docs.nestjs.com/deployment) for more information.
+No Floating Promises: Ensure database calls and async functions use await.
 
-If you are looking for a cloud-based platform to deploy your NestJS application, check out [Mau](https://mau.nestjs.com), our official platform for deploying NestJS applications on AWS. Mau makes deployment straightforward and fast, requiring just a few simple steps:
+Complexity: Maximum depth of nested blocks (if/for) is set to 4.
 
-```bash
-$ yarn install -g @nestjs/mau
-$ mau deploy
-```
+## 🎯 Code Quality Workflow
 
-With Mau, you can deploy your application in just a few clicks, allowing you to focus on building features rather than managing infrastructure.
+Pre-commit: Husky runs yarn lint to ensure no broken code, unused variables, or wrong file names are committed.
+
+CI/CD: On every push or pull request to main, GitHub Actions automatically runs Checkout, Setup Node, Install dependencies, Lint, Format Check, Build, and Test. PRs will be blocked if any step fails.
 
 ## Resources
 
