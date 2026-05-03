@@ -13,6 +13,7 @@
     "target": "ES2022",
     "sourceMap": true,
     "outDir": "./dist",
+    "rootDir": "./src",
     "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
@@ -23,5 +24,10 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "ignoreDeprecations": "6.0",
-  }
+    "types": ["jest", "node"],
+  },
+  "exclude": [
+    "node_modules",
+    "dist",
+  ]
 }
