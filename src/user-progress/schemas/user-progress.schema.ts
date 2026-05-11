@@ -1,6 +1,10 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { Document, Types } from 'mongoose';
 
+import { LastRating } from '../../common/enums/last-rating.enum';
+import { LearningMode } from '../../common/enums/learning-mode.enum';
+import { State } from '../../common/enums/state.enum';
+
 @Schema({ collection: 'user_progress' })
 export class UserProgress extends Document {
   @Prop({ type: Types.ObjectId, ref: 'User', required: true })
@@ -9,8 +13,8 @@ export class UserProgress extends Document {
   @Prop({ type: Types.ObjectId, ref: 'Card', required: true })
   card_id!: Types.ObjectId;
 
-  @Prop()
-  learning_mode!: string;
+  @Prop({ type: String, enum: LearningMode })
+  learning_mode!: LearningMode;
 
   @Prop()
   deadline_date!: Date;
@@ -21,8 +25,8 @@ export class UserProgress extends Document {
   @Prop({ default: 0 })
   total_hints_used!: number;
 
-  @Prop()
-  state!: string;
+  @Prop({ type: String, enum: State, default: State.NEW })
+  state!: State;
 
   @Prop()
   difficulty!: number;
@@ -45,8 +49,8 @@ export class UserProgress extends Document {
   @Prop()
   next_review_date!: Date;
 
-  @Prop()
-  last_rating!: string;
+  @Prop({ type: String, enum: LastRating })
+  last_rating!: LastRating;
 }
 
 export const UserProgressSchema = SchemaFactory.createForClass(UserProgress);

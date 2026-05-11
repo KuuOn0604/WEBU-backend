@@ -1,6 +1,7 @@
 import { Module } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { MongooseModule } from '@nestjs/mongoose';
+import { Connection, Schema } from 'mongoose';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -15,12 +16,32 @@ import { UsersModule } from './users/users.module';
     ConfigModule.forRoot({
       isGlobal: true,
     }),
-    MongooseModule.forRoot(process.env.MONGODB_URI!),
     UsersModule,
     CardsModule,
     TestCasesModule,
     UserProgressModule,
     SubmissionsModule,
+    MongooseModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: (configService: ConfigService) => ({
+        uri: configService.get<string>('MONGODB_URI'),
+        connectionFactory: (connection: Connection) => {
+          connection.plugin((schema: Schema) => {
+            schema.set('toJSON', {
+              virtuals: true,
+              versionKey: false,
+              transform: (_doc: any, ret: Record<string, any>) => {
+                delete ret._id;
+                return ret;
+              },
+            });
+            schema.set('toObject', { virtuals: true });
+          });
+          return connection;
+        },
+      }),
+    }),
   ],
   controllers: [AppController],
   providers: [AppService],

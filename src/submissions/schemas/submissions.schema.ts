@@ -29,6 +29,9 @@ export class Submission extends Document {
 
   @Prop()
   error_details!: string;
+
+  @Prop()
+  hints_used_this_session!: number;
 }
 
 export const SubmissionSchema = SchemaFactory.createForClass(Submission);

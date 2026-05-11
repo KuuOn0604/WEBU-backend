@@ -62,28 +62,44 @@ The API will be available at **http://localhost:3000**.
 
 ```
 webu-backend/
-├── .github/workflows/    # GitHub Actions CI (Lint, Format, Build, Test)
-├── .husky/               # Git hooks (pre-commit -> yarn lint)
+├── .github/workflows/      # GitHub Actions CI (Lint, Format, Build, Test)
+├── .husky/                 # Git hooks (pre-commit -> yarn lint)
 ├── src/
-│   ├── submissions/
-│   ├── test-cases/
-│   ├── user-progress/
-│   ├── users/
-│   ├── cards/
-│   ├── common/           # Shared guards, interceptors, constants, decorators
-│   ├── config/           # Environment variables and app configurations
-│   ├── modules/          # Feature modules (Auth, User, etc.)
-│   │   └── user/
-│   │       ├── dto/                  # Data Transfer Objects
-│   │       ├── user.controller.ts    # API Endpoints
-│   │       ├── user.service.ts       # Business Logic
-│   │       └── user.module.ts        # Module Encapsulation
-│   ├── app.module.ts     # Root module
-│   └── main.ts           # App entry point
-├── eslint.config.mjs     # ESLint flat config (Strict Naming & Type Rules)
-├── .prettierrc           # Prettier config
-├── nest-cli.json         # NestJS CLI configuration
-└── tsconfig.json         # TypeScript configurations
+│   ├── cards/              # Mẫu API
+│   │   ├── dto/
+│   │   │   └── get-cards-filter.dto.ts  # (1) Query params validation
+│   │   ├── schemas/        # Định nghĩa Mongoose Schema
+│   │   ├── cards.controller.ts          # (2) API Endpoints
+│   │   ├── cards.service.ts             # (3) Business Logic
+│   │   └── cards.module.ts              # (4) Module Encapsulation
+│   ├── common/             # Shared guards, interceptors, constants, enums...
+│   │   └── enums/          # Enum (Difficulty, Role, Status)
+│   ├── submissions/        # Feature: Quản lý nộp bài và chấm code
+│   │   ├── dto/
+│   │   ├── schemas/
+│   │   ├── submissions.controller.ts
+│   │   ├── submissions.service.ts
+│   │   └── submissions.module.ts
+│   ├── test-cases/         # Feature: Quản lý bộ test data
+│   │   ├── schemas/
+│   │   └── ...
+│   ├── user-progress/      # Feature: Thuật toán FSRS & Tiến độ học tập
+│   │   ├── schemas/
+│   │   └── ...
+│   ├── users/              # Feature: Quản lý người dùng & Profile
+│   │   ├── dto/
+│   │   ├── schemas/
+│   │   ├── users.controller.ts
+│   │   ├── users.service.ts
+│   │   └── users.module.ts
+│   ├── app.module.ts       # Root module (Kết nối database & các feature)
+│   └── main.ts             # Entry point (Khởi tạo NestJS app)
+├── .env                    # Biến môi trường (MONGODB_URI, JWT_SECRET)
+├── eslint.config.mjs       # ESLint flat config (Strict Naming & Type Rules)
+├── nest-cli.json           # NestJS CLI configuration
+├── package.json            # Project dependencies & scripts
+├── README.md               # Project documentation
+└── tsconfig.json           # TypeScript configurations
 ```
 
 ## ⚠️ Coding Conventions & Rules
