@@ -32,6 +32,16 @@ yarn prepare
 yarn start:dev
 ```
 
+## 🛠 Precheck
+
+```bash
+# 1. Eslint check
+yarn lint
+
+# 2. TS Build test
+npx tsc --noEmit -p tsconfig.build.json
+```
+
 The API will be available at **http://localhost:3000**.
 
 ## 📜 Available Scripts
@@ -55,6 +65,11 @@ webu-backend/
 ├── .github/workflows/    # GitHub Actions CI (Lint, Format, Build, Test)
 ├── .husky/               # Git hooks (pre-commit -> yarn lint)
 ├── src/
+│   ├── submissions/
+│   ├── test-cases/
+│   ├── user-progress/
+│   ├── users/
+│   ├── cards/
 │   ├── common/           # Shared guards, interceptors, constants, decorators
 │   ├── config/           # Environment variables and app configurations
 │   ├── modules/          # Feature modules (Auth, User, etc.)
