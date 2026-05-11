@@ -40,6 +40,7 @@ export default tseslint.config(
       '@typescript-eslint/no-unsafe-argument': 'warn',
       "prettier/prettier": ["error", { endOfLine: "auto" }],
       // vars
+      "@typescript-eslint/no-unused-vars": "off",
       "no-unused-vars": "off", 
       "unused-imports/no-unused-vars": [
         "warn",
