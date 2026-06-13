@@ -9,14 +9,10 @@ describe('UsersController', () => {
 
   const mockUsersService = {
     create: jest.fn(),
-    findAll: jest.fn(),
     updateSetup: jest.fn(),
     getDailyTasks: jest.fn(),
     reviewCard: jest.fn(),
     getStats: jest.fn(),
-    findOne: jest.fn(),
-    update: jest.fn(),
-    remove: jest.fn(),
   };
 
   const mockJwtService = {

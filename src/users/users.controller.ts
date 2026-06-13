@@ -1,11 +1,9 @@
 import {
   Body,
   Controller,
-  Delete,
   Get,
   HttpCode,
   Param,
-  Patch,
   Post,
   Put,
   UseGuards,
@@ -15,26 +13,13 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
-import { CreateUserDto } from './dto/create-user.dto';
 import { OnboardingSetupDto } from './dto/onboarding-setup.dto';
 import { ReviewCardDto } from './dto/review-card.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
-import { User } from './schemas/users.schema';
 import { UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
-
-  @Post()
-  create(@Body() createUserDto: CreateUserDto): Promise<User> {
-    return this.usersService.create(createUserDto);
-  }
-
-  @Get()
-  findAll(): Promise<User[]> {
-    return this.usersService.findAll();
-  }
 
   // Cấu hình onboarding cho user
   @Put('me/setup')
@@ -91,24 +76,5 @@ export class UsersController {
     }[];
   }> {
     return this.usersService.getStats(user.sub);
-  }
-
-  // Dynamic route đặt sau các route cố định
-  @Get(':id')
-  findOne(@Param('id') id: string): Promise<User | null> {
-    return this.usersService.findOne(id);
-  }
-
-  @Patch(':id')
-  update(
-    @Param('id') id: string,
-    @Body() updateUserDto: UpdateUserDto,
-  ): Promise<User | null> {
-    return this.usersService.update(id, updateUserDto);
-  }
-
-  @Delete(':id')
-  remove(@Param('id') id: string): Promise<User | null> {
-    return this.usersService.remove(id);
   }
 }

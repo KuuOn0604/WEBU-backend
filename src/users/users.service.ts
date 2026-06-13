@@ -9,7 +9,6 @@ import { Submission } from '../submissions/schemas/submissions.schema';
 import { UserProgress } from '../user-progress/schemas/user-progress.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { OnboardingSetupDto } from './dto/onboarding-setup.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
 import { OnboardingSurvey, User } from './schemas/users.schema';
 
 @Injectable()
@@ -34,24 +33,6 @@ export class UsersService {
 
   async findById(id: string): Promise<User | null> {
     return this.userModel.findById(id).exec();
-  }
-
-  async findAll(): Promise<User[]> {
-    return this.userModel.find().exec();
-  }
-
-  async findOne(id: string): Promise<User | null> {
-    return this.userModel.findById(id).exec();
-  }
-
-  async update(id: string, updateUserDto: UpdateUserDto): Promise<User | null> {
-    return this.userModel
-      .findByIdAndUpdate(id, updateUserDto, { new: true })
-      .exec();
-  }
-
-  async remove(id: string): Promise<User | null> {
-    return this.userModel.findByIdAndDelete(id).exec();
   }
 
   async updateSetup(
