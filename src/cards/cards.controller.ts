@@ -1,36 +1,27 @@
 import { Controller, Get, Param, Query } from '@nestjs/common';
-import { ApiOperation, ApiParam, ApiResponse, ApiTags } from '@nestjs/swagger';
 
 import { CardsService } from './cards.service';
 import { GetCardsFilterDto } from './dto/get-cards-filter.dto';
+import { Card } from './schemas/cards.schema';
 
-@ApiTags('cards')
 @Controller('cards')
 export class CardsController {
   constructor(private readonly cardsService: CardsService) {}
 
   @Get()
-  @ApiOperation({ summary: 'Lấy danh sách bài tập' })
-  @ApiResponse({
-    status: 200,
-    description: 'Trả về danh sách thẻ bài và metadata phân trang.',
-  })
-  findAll(@Query() filterDto: GetCardsFilterDto) {
+  findAll(@Query() filterDto: GetCardsFilterDto): Promise<{
+    data: Card[];
+    meta: {
+      total_items: number;
+      current_page: number;
+      total_pages: number;
+    };
+  }> {
     return this.cardsService.findAll(filterDto);
   }
 
   @Get(':id')
-  @ApiOperation({ summary: 'Lấy chi tiết một bài tập kèm public test cases' })
-  @ApiParam({ name: 'id', description: 'ID của bài tập' })
-  @ApiResponse({
-    status: 200,
-    description: 'Trả về chi tiết bài tập.',
-  })
-  @ApiResponse({
-    status: 404,
-    description: 'Không tìm thấy bài tập.',
-  })
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): Promise<unknown> {
     return this.cardsService.findOne(id);
   }
 }

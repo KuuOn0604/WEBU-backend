@@ -1,27 +1,41 @@
 import { Injectable } from '@nestjs/common';
+import { InjectModel } from '@nestjs/mongoose';
+import { Model } from 'mongoose';
 
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { UpdateSubmissionDto } from './dto/update-submission.dto';
+import { Submission } from './schemas/submissions.schema';
 
 @Injectable()
 export class SubmissionsService {
-  create(_createSubmissionDto: CreateSubmissionDto) {
-    return 'This action adds a new submission';
+  constructor(
+    @InjectModel(Submission.name)
+    private readonly submissionModel: Model<Submission>,
+  ) {}
+
+  async create(createSubmissionDto: CreateSubmissionDto): Promise<Submission> {
+    const createdSubmission = new this.submissionModel(createSubmissionDto);
+    return createdSubmission.save();
   }
 
-  findAll() {
-    return `This action returns all submissions`;
+  async findAll(): Promise<Submission[]> {
+    return this.submissionModel.find().exec();
   }
 
-  findOne(id: number) {
-    return `This action returns a #${id} submission`;
+  async findOne(id: string): Promise<Submission | null> {
+    return this.submissionModel.findById(id).exec();
   }
 
-  update(id: number, _updateSubmissionDto: UpdateSubmissionDto) {
-    return `This action updates a #${id} submission`;
+  async update(
+    id: string,
+    updateSubmissionDto: UpdateSubmissionDto,
+  ): Promise<Submission | null> {
+    return this.submissionModel
+      .findByIdAndUpdate(id, updateSubmissionDto, { new: true })
+      .exec();
   }
 
-  remove(id: number) {
-    return `This action removes a #${id} submission`;
+  async remove(id: string): Promise<Submission | null> {
+    return this.submissionModel.findByIdAndDelete(id).exec();
   }
 }

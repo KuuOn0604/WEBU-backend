@@ -9,10 +9,17 @@ import { Card } from './schemas/cards.schema';
 export class CardsService {
   constructor(
     @InjectModel(Card.name) private cardModel: Model<Card>,
-    @InjectModel('TestCase') private testCaseModel: Model<any>,
+    @InjectModel('TestCase') private testCaseModel: Model<unknown>,
   ) {}
 
-  async findAll(filterDto: GetCardsFilterDto) {
+  async findAll(filterDto: GetCardsFilterDto): Promise<{
+    data: Card[];
+    meta: {
+      total_items: number;
+      current_page: number;
+      total_pages: number;
+    };
+  }> {
     const { page = 1, limit = 10, tags, difficulty_level } = filterDto;
     const query: QueryFilter<Card> = {};
 
@@ -40,7 +47,7 @@ export class CardsService {
     };
   }
 
-  async findOne(id: string) {
+  async findOne(id: string): Promise<unknown> {
     const card = await this.cardModel.findById(id).exec();
     if (!card) {
       throw new NotFoundException('Không tìm thấy bài tập này');

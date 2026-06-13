@@ -16,5 +16,6 @@ import { UserProgressService } from './user-progress.service';
   ],
   controllers: [UserProgressController],
   providers: [UserProgressService],
+  exports: [UserProgressService, MongooseModule],
 })
 export class UserProgressModule {}

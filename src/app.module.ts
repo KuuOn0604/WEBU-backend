@@ -5,6 +5,7 @@ import { Connection, Schema } from 'mongoose';
 
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
+import { AuthModule } from './auth/auth.module';
 import { CardsModule } from './cards/cards.module';
 import { SubmissionsModule } from './submissions/submissions.module';
 import { TestCasesModule } from './test-cases/test-cases.module';
@@ -31,7 +32,7 @@ import { UsersModule } from './users/users.module';
             schema.set('toJSON', {
               virtuals: true,
               versionKey: false,
-              transform: (_doc: any, ret: Record<string, any>) => {
+              transform: (_doc: unknown, ret: Record<string, unknown>) => {
                 delete ret._id;
                 return ret;
               },
@@ -42,6 +43,7 @@ import { UsersModule } from './users/users.module';
         },
       }),
     }),
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

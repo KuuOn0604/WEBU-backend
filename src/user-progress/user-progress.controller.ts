@@ -17,17 +17,17 @@ export class UserProgressController {
   constructor(private readonly userProgressService: UserProgressService) {}
 
   @Post()
-  create(@Body() createUserProgressDto: CreateUserProgressDto) {
+  create(@Body() createUserProgressDto: CreateUserProgressDto): string {
     return this.userProgressService.create(createUserProgressDto);
   }
 
   @Get()
-  findAll() {
+  findAll(): string {
     return this.userProgressService.findAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  findOne(@Param('id') id: string): string {
     return this.userProgressService.findOne(+id);
   }
 
@@ -35,12 +35,12 @@ export class UserProgressController {
   update(
     @Param('id') id: string,
     @Body() updateUserProgressDto: UpdateUserProgressDto,
-  ) {
+  ): string {
     return this.userProgressService.update(+id, updateUserProgressDto);
   }
 
   @Delete(':id')
-  remove(@Param('id') id: string) {
+  remove(@Param('id') id: string): string {
     return this.userProgressService.remove(+id);
   }
 }

@@ -5,23 +5,23 @@ import { UpdateUserProgressDto } from './dto/update-user-progress.dto';
 
 @Injectable()
 export class UserProgressService {
-  create(_createUserProgressDto: CreateUserProgressDto) {
+  create(_createUserProgressDto: CreateUserProgressDto): string {
     return 'This action adds a new userProgress';
   }
 
-  findAll() {
+  findAll(): string {
     return `This action returns all userProgress`;
   }
 
-  findOne(id: number) {
+  findOne(id: number): string {
     return `This action returns a #${id} userProgress`;
   }
 
-  update(id: number, _updateUserProgressDto: UpdateUserProgressDto) {
+  update(id: number, _updateUserProgressDto: UpdateUserProgressDto): string {
     return `This action updates a #${id} userProgress`;
   }
 
-  remove(id: number) {
+  remove(id: number): string {
     return `This action removes a #${id} userProgress`;
   }
 }

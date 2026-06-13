@@ -13,5 +13,6 @@ import { SubmissionsService } from './submissions.service';
   ],
   controllers: [SubmissionsController],
   providers: [SubmissionsService],
+  exports: [SubmissionsService, MongooseModule],
 })
 export class SubmissionsModule {}
