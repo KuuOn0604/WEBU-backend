@@ -10,6 +10,7 @@ import {
   Put,
   UseGuards,
 } from '@nestjs/common';
+import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
@@ -38,6 +39,7 @@ export class UsersController {
   // Cấu hình onboarding cho user
   @Put('me/setup')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   updateSetup(
     @CurrentUser() user: JwtPayload,
     @Body() setupDto: OnboardingSetupDto,
@@ -52,6 +54,7 @@ export class UsersController {
   // Lấy nhiệm vụ ôn tập hàng ngày
   @Get('me/daily-tasks')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getDailyTasks(@CurrentUser() user: JwtPayload): Promise<
     {
       card_id: string;
@@ -66,6 +69,7 @@ export class UsersController {
   @Post('me/daily-tasks/:card_id/review')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
+  @ApiBearerAuth()
   reviewCard(
     @CurrentUser() user: JwtPayload,
     @Param('card_id') cardId: string,
@@ -77,6 +81,7 @@ export class UsersController {
   // Xem Dashboard thống kê
   @Get('me/stats')
   @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
   getStats(@CurrentUser() user: JwtPayload): Promise<{
     total_cards_mastered: number;
     average_retention_rate: number;
