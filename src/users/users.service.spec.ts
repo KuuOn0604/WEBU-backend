@@ -1,9 +1,8 @@
 import { getModelToken } from '@nestjs/mongoose';
 import { Test, TestingModule } from '@nestjs/testing';
 
-import { Card } from '../cards/schemas/cards.schema';
 import { Submission } from '../submissions/schemas/submissions.schema';
-import { UserProgress } from '../user-progress/schemas/user-progress.schema';
+import { UserProgressService } from '../user-progress/user-progress.service';
 import { User } from './schemas/users.schema';
 import { UsersService } from './users.service';
 
@@ -22,6 +21,12 @@ describe('UsersService', () => {
     exec: jest.fn(),
   };
 
+  const mockUserProgressService = {
+    getDailyTasks: jest.fn(),
+    reviewCard: jest.fn(),
+    getProgressStats: jest.fn(),
+  };
+
   beforeEach(async () => {
     const module: TestingModule = await Test.createTestingModule({
       providers: [
@@ -31,16 +36,12 @@ describe('UsersService', () => {
           useValue: mockModel,
         },
         {
-          provide: getModelToken(UserProgress.name),
-          useValue: mockModel,
-        },
-        {
           provide: getModelToken(Submission.name),
           useValue: mockModel,
         },
         {
-          provide: getModelToken(Card.name),
-          useValue: mockModel,
+          provide: UserProgressService,
+          useValue: mockUserProgressService,
         },
       ],
     }).compile();

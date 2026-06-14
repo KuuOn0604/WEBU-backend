@@ -14,10 +14,10 @@ export class UserProgress extends Document {
   card_id!: Types.ObjectId;
 
   @Prop({ type: String, enum: LearningMode })
-  learning_mode!: LearningMode;
+  learning_mode?: LearningMode;
 
   @Prop()
-  deadline_date!: Date;
+  deadline_date?: Date;
 
   @Prop({ default: 0 })
   total_wrong_submissions!: number;
@@ -29,10 +29,10 @@ export class UserProgress extends Document {
   state!: State;
 
   @Prop()
-  difficulty!: number;
+  difficulty?: number;
 
   @Prop()
-  stability!: number;
+  stability?: number;
 
   @Prop({ default: 0 })
   reps!: number;
@@ -41,16 +41,16 @@ export class UserProgress extends Document {
   lapses!: number;
 
   @Prop()
-  scheduled_days!: number;
+  scheduled_days?: number;
 
   @Prop()
-  last_reviewed_at!: Date;
+  last_reviewed_at?: Date;
 
   @Prop()
-  next_review_date!: Date;
+  next_review_date?: Date;
 
   @Prop({ type: String, enum: LastRating })
-  last_rating!: LastRating;
+  last_rating?: LastRating;
 }
 
 export const UserProgressSchema = SchemaFactory.createForClass(UserProgress);
