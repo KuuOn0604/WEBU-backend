@@ -17,5 +17,6 @@ const DummyTestCaseSchema = new Schema({}, { strict: false });
   ],
   controllers: [CardsController],
   providers: [CardsService],
+  exports: [CardsService, MongooseModule],
 })
 export class CardsModule {}

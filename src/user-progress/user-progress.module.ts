@@ -1,6 +1,8 @@
-import { Module } from '@nestjs/common';
+import { forwardRef, Module } from '@nestjs/common';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { AuthModule } from '../auth/auth.module';
+import { CardsModule } from '../cards/cards.module';
 import {
   UserProgress,
   UserProgressSchema,
@@ -13,8 +15,11 @@ import { UserProgressService } from './user-progress.service';
     MongooseModule.forFeature([
       { name: UserProgress.name, schema: UserProgressSchema },
     ]),
+    CardsModule,
+    forwardRef(() => AuthModule),
   ],
   controllers: [UserProgressController],
   providers: [UserProgressService],
+  exports: [UserProgressService, MongooseModule],
 })
 export class UserProgressModule {}
