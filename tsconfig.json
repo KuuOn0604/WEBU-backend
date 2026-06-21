@@ -23,7 +23,6 @@
     "strictBindCallApply": false,
     "noFallthroughCasesInSwitch": false,
     "strict": true,
-    "ignoreDeprecations": "6.0",
     "types": ["jest", "node"],
   },
   "include": [
