@@ -5,7 +5,6 @@ import {
   Logger,
 } from '@nestjs/common';
 
-// Định nghĩa Interface chuẩn cấu hình để ép kiểu dữ liệu trả về, xóa bỏ 'any'
 export interface AiGeneratedProblemResponse {
   title: string;
   description: string;
@@ -19,7 +18,6 @@ export interface AiGeneratedProblemResponse {
 
 @Injectable()
 export class AiService {
-  // Thay thế console bằng Logger của NestJS để tránh dính quy tắc no-console
   private readonly logger = new Logger(AiService.name);
   private readonly genAI: GoogleGenerativeAI;
 
@@ -36,33 +34,36 @@ export class AiService {
         properties: {
           title: {
             type: SchemaType.STRING,
-            description: 'Tiêu đề ngắn gọn của bài toán trích xuất từ ảnh',
+            description:
+              'A concise title of the programming problem extracted from the image',
           },
           description: {
             type: SchemaType.STRING,
             description:
-              'Mô tả toàn bộ yêu cầu, input, output, constraints của đề bài',
+              'Full description of the problem, including requirements, inputs, outputs, and constraints',
           },
           difficulty: {
             type: SchemaType.STRING,
             description:
-              'Độ khó, bắt buộc phải là một trong ba chữ: Easy, Medium, hoặc Hard',
+              'Difficulty level, must be exactly one of the following values: Easy, Medium, or Hard',
           },
           tags: {
             type: SchemaType.ARRAY,
-            items: { type: SchemaType.STRING }, //  Đã sửa thành "type:" chuẩn chỉ ở đây
-            description: 'Mảng các tag thuật toán liên quan',
+            items: { type: SchemaType.STRING },
+            description: 'An array of relevant algorithmic or topic tags',
           },
           group: {
             type: SchemaType.STRING,
-            description: "Nhóm môn học phù hợp, chỉ chọn 'KTLT' hoặc 'DSA'",
+            description:
+              "The course category, must be exactly either 'KTLT' or 'DSA'",
           },
           boilerplateCode: {
             type: SchemaType.OBJECT,
             properties: {
               cpp: {
                 type: SchemaType.STRING,
-                description: 'Khung code C++ khởi tạo sẵn',
+                description:
+                  'The initial C++ boilerplate code or skeleton function for the problem',
               },
             },
           },
@@ -86,7 +87,7 @@ export class AiService {
       };
 
       const systemInstruction =
-        'Bạn là một hệ thống OCR nâng cao dành cho lập trình viên. Hãy phân tích hình ảnh đề bài lập trình được cung cấp. Trích xuất thông tin chính xác và định dạng theo JSON schema.';
+        'You are an advanced OCR and software engineering assistant. Analyze the provided programming problem image. Extract key details accurately and format the output according to the requested JSON schema.';
 
       const result = await model.generateContent([
         systemInstruction,
@@ -95,9 +96,9 @@ export class AiService {
 
       return JSON.parse(result.response.text()) as AiGeneratedProblemResponse;
     } catch (error) {
-      this.logger.error('Lỗi Gemini Service:', error);
+      this.logger.error('Gemini Service Error:', error);
       throw new InternalServerErrorException(
-        'AI không đọc được ảnh này rồi, thử lại xem sao con vợ.',
+        'Failed to process the image. Please try again with a clearer image or check the service availability.',
       );
     }
   }

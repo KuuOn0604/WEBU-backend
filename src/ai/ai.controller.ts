@@ -7,20 +7,21 @@ import {
   UseInterceptors,
 } from '@nestjs/common';
 import { FileInterceptor } from '@nestjs/platform-express';
-// Import thêm ApiBody và ApiConsumes từ Swagger để cấu hình UI
 import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 
 import { AiGeneratedProblemResponse, AiService } from './ai.service';
 
-@ApiTags('Ai') // Gom nhóm endpoint này vào group 'Ai' trên Swagger UI
+@ApiTags('Ai')
 @Controller('api/ai')
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 
   @Post('generate-problem')
-  @ApiOperation({ summary: 'Bóc tách đề bài lập trình từ hình ảnh bằng AI' })
+  @ApiOperation({
+    summary: 'Extract and structure programming problem from an image using AI',
+  })
   @UseInterceptors(FileInterceptor('image'))
-  @ApiConsumes('multipart/form-data') // 1. Định nghĩa kiểu dữ liệu gửi lên là form-data
+  @ApiConsumes('multipart/form-data')
   @ApiBody({
     schema: {
       type: 'object',
@@ -28,7 +29,8 @@ export class AiController {
         image: {
           type: 'string',
           format: 'binary',
-          description: 'Hình ảnh đề bài cần AI trích xuất',
+          description:
+            'The image file containing the programming problem to be extracted',
         },
       },
       required: ['image'],
@@ -38,7 +40,9 @@ export class AiController {
     @UploadedFile() file: Express.Multer.File,
   ): Promise<AiGeneratedProblemResponse> {
     if (!file) {
-      throw new BadRequestException('Con vợ chưa tải ảnh đề bài lên kìa!');
+      throw new BadRequestException(
+        'Image file is required. Please upload a valid image.',
+      );
     }
     return this.aiService.generateFromImage(file);
   }
