@@ -1,0 +1,31 @@
+{
+  "output": {
+    "filePath": "repomix.md",
+    "style": "markdown"
+  },
+  "include": ["src/**/*.ts"],
+  "ignore": {
+    "useGitignore": true,
+    "useDefaultPatterns": true,
+    "customPatterns": [
+      "dist",
+      "build",
+      "coverage",
+      "test",
+      "**/*.spec.ts",
+      "*.log",
+      "*.lock",
+      ".env",
+      "package-lock.json",
+      "yarn.lock",
+      "pnpm-lock.yaml",
+      "API_collection.html"
+    ]
+  },
+  "security": {
+    "enableSecurityCheck": true
+  },
+  "tokenCount": {
+    "enabled": true
+  }
+}
