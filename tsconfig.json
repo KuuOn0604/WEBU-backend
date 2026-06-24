@@ -25,6 +25,9 @@
     "strict": true,
     "ignoreDeprecations": "6.0",
     "types": ["jest", "node"],
+    "paths": {
+      "@/*": ["./src/*"]
+    },
   },
   "include": [
     "src/**/*"
@@ -33,5 +36,6 @@
     "node_modules",
     "dist",
     "test"
-  ]
+  ],
+  
 }
