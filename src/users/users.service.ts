@@ -26,6 +26,24 @@ export class UsersService {
     return this.userModel.findOne({ email }).exec();
   }
 
+  async findByGoogleId(googleId: string): Promise<User | null> {
+    return this.userModel.findOne({ googleId }).exec();
+  }
+
+  async linkGoogleId(
+    userId: string,
+    googleId: string,
+    avatar?: string,
+  ): Promise<User | null> {
+    return this.userModel
+      .findByIdAndUpdate(
+        userId,
+        { googleId, ...(avatar ? { avatar } : {}) },
+        { new: true },
+      )
+      .exec();
+  }
+
   async findById(id: string): Promise<User | null> {
     return this.userModel.findById(id).exec();
   }
