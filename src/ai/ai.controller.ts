@@ -1,6 +1,7 @@
 /// <reference types="multer" />
 import {
   BadRequestException,
+  Body,
   Controller,
   Post,
   UploadedFile,
@@ -45,5 +46,26 @@ export class AiController {
       );
     }
     return this.aiService.generateFromImage(file);
+  }
+
+  @Post('chat')
+  @ApiOperation({ summary: 'AI Tutor chat for problem-solving guidance' })
+  async chat(
+    @Body()
+    body: {
+      message: string;
+      problem_title?: string;
+      problem_description?: string;
+    },
+  ): Promise<{ reply: string }> {
+    if (!body.message) {
+      throw new BadRequestException('message is required');
+    }
+    const reply = await this.aiService.chatWithTutor(
+      body.message,
+      body.problem_title ?? 'Unknown Problem',
+      body.problem_description ?? '',
+    );
+    return { reply };
   }
 }

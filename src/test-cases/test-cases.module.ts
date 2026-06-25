@@ -13,5 +13,6 @@ import { TestCasesService } from './test-cases.service';
   ],
   controllers: [TestCasesController],
   providers: [TestCasesService],
+  exports: [TestCasesService, MongooseModule],
 })
 export class TestCasesModule {}

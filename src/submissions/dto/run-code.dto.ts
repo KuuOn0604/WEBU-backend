@@ -2,12 +2,12 @@ import { IsEnum, IsMongoId, IsString } from 'class-validator';
 
 import { Language } from '../../common/enums/language.enum';
 
-export class CreateSubmissionDto {
+export class RunCodeDto {
   @IsMongoId()
   card_id!: string;
 
   @IsString()
-  submitted_code!: string;
+  code!: string;
 
   @IsEnum(Language)
   language!: Language;

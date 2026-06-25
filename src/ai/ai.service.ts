@@ -102,4 +102,41 @@ export class AiService {
       );
     }
   }
+
+  /**
+   * AI Tutor chat - trả lời câu hỏi về bài tập lập trình
+   */
+  async chatWithTutor(
+    message: string,
+    problemTitle: string,
+    problemDescription: string,
+  ): Promise<string> {
+    try {
+      const model = this.genAI.getGenerativeModel({
+        model: 'gemini-2.5-flash',
+      });
+
+      const systemPrompt = `Bạn là AI Tutor của hệ thống học lập trình W.E.B.U. 
+Bạn đang hỗ trợ học viên giải bài tập: "${problemTitle}".
+
+Mô tả bài tập:
+${problemDescription}
+
+Hướng dẫn:
+- Trả lời bằng tiếng Việt trừ khi người dùng hỏi bằng tiếng Anh
+- Đừng cho code đầy đủ trực tiếp, hãy gợi ý từng bước
+- Khuyến khích học viên tự suy nghĩ
+- Giải thích thuật toán và ý tưởng rõ ràng
+- Giữ câu trả lời ngắn gọn (dưới 300 từ)
+- Nếu được hỏi về bài khác, hướng dẫn về bài đang làm
+
+Câu hỏi của học viên: ${message}`;
+
+      const result = await model.generateContent(systemPrompt);
+      return result.response.text();
+    } catch (error) {
+      this.logger.error('AI Tutor Chat Error:', error);
+      return 'Xin lỗi, mình không thể kết nối đến AI lúc này. Vui lòng thử lại sau nhé!';
+    }
+  }
 }
