@@ -33,16 +33,6 @@ class IdeData {
   // theme, fontSize, defaultLanguage...
 }
 @Schema({ _id: false })
-class FollowUpMcq {
-  @Prop({ required: true })
-  question!: string;
-
-  @Prop({ type: [String], required: true })
-  options!: string[];
-
-  @Prop({ required: true })
-  correct_index!: number;
-}
 // SCHEMA CHÍNH
 @Schema({
   collection: 'cards',
@@ -63,12 +53,6 @@ export class Card extends Document {
 
   @Prop({ type: IdeData })
   ide_data!: IdeData;
-
-  @Prop()
-  ai_hint_content!: string;
-
-  @Prop({ type: FollowUpMcq })
-  follow_up_mcq!: FollowUpMcq;
 
   @Prop({
     type: String,

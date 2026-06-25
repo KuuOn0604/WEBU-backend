@@ -24,6 +24,8 @@
     "noFallthroughCasesInSwitch": false,
     "strict": true,
     "types": ["jest", "node"],
+    "ignoreDeprecations": "6.0",
+    "types": ["jest", "node", "multer"],
   },
   "include": [
     "src/**/*"

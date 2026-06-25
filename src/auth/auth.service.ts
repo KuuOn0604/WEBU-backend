@@ -100,7 +100,7 @@ export class AuthService {
 
     return {
       token,
-      expires_in: 43200, // 12 hours in seconds
+      expires_in: 43200,
       user: {
         id: user._id.toString(),
         username: user.username,
