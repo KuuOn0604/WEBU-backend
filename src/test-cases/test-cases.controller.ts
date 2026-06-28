@@ -6,6 +6,7 @@ import {
   Param,
   Patch,
   Post,
+  Query,
 } from '@nestjs/common';
 
 import { CreateTestCaseDto } from './dto/create-test-case.dto';
@@ -23,7 +24,10 @@ export class TestCasesController {
   }
 
   @Get()
-  findAll(): Promise<TestCase[]> {
+  findAll(@Query('card_id') cardId?: string): Promise<TestCase[]> {
+    if (cardId) {
+      return this.testCasesService.findByCard(cardId);
+    }
     return this.testCasesService.findAll();
   }
 

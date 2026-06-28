@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model } from 'mongoose';
+import { Model, Types } from 'mongoose';
 
 import { CreateTestCaseDto } from './dto/create-test-case.dto';
 import { UpdateTestCaseDto } from './dto/update-test-case.dto';
@@ -23,6 +23,21 @@ export class TestCasesService {
 
   async findOne(id: string): Promise<TestCase | null> {
     return this.testCaseModel.findById(id).exec();
+  }
+
+  /**
+   * Lấy test cases theo card_id
+   * @param cardId - ID của card/bài tập
+   * @param isHidden - lọc theo hidden (undefined = lấy tất cả)
+   */
+  async findByCard(cardId: string, isHidden?: boolean): Promise<TestCase[]> {
+    const query: Record<string, unknown> = {
+      card_id: new Types.ObjectId(cardId),
+    };
+    if (isHidden !== undefined) {
+      query.is_hidden = isHidden;
+    }
+    return this.testCaseModel.find(query).sort({ order: 1 }).exec();
   }
 
   async update(

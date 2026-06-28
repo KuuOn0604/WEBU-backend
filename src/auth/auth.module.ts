@@ -22,7 +22,7 @@ import { AuthService } from './auth.service';
     }),
   ],
   controllers: [AuthController],
-  providers: [AuthService],
+  providers: [AuthService, ConfigService],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

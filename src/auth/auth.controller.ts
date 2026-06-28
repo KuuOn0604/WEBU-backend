@@ -9,6 +9,7 @@ import {
 import { ApiBearerAuth } from '@nestjs/swagger';
 
 import { AuthService } from './auth.service';
+import { GoogleLoginDto } from './dto/google-login.dto';
 import { LoginDto } from './dto/login.dto';
 import { RegisterDto } from './dto/register.dto';
 import { JwtAuthGuard } from './guards/jwt-auth.guard';
@@ -43,6 +44,23 @@ export class AuthController {
     };
   }> {
     return this.authService.login(loginDto);
+  }
+
+  @Post('google')
+  @HttpCode(HttpStatus.OK)
+  googleLogin(@Body() googleLoginDto: GoogleLoginDto): Promise<{
+    token?: string;
+    expires_in?: number;
+    user?: {
+      id: string;
+      username: string;
+      email: string;
+      role: string;
+    };
+    requirePassword?: boolean;
+    email?: string;
+  }> {
+    return this.authService.googleLogin(googleLoginDto);
   }
 
   @Post('logout')
