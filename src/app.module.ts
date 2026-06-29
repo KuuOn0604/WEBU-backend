@@ -48,6 +48,7 @@ import { UsersModule } from './users/users.module';
     }),
     AiModule,
     AuthModule,
+    AiModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -49,13 +49,14 @@ export class CardsService {
   }
 
   async findOne(id: string): Promise<unknown> {
-    let card: (typeof this.cardModel extends Model<infer T> ? T : never) | null;
+    let card: Card | null = null;
     if (Types.ObjectId.isValid(id)) {
       card = await this.cardModel.findById(id).exec();
     } else {
       const titleQuery = id.split('-').join(' ');
+      const escapedTitle = titleQuery.replace(/[/\-\\^$*+?.()|[\]{}]/g, '\\$&');
       card = await this.cardModel
-        .findOne({ title: { $regex: new RegExp(`^${titleQuery}$`, 'i') } })
+        .findOne({ title: { $regex: new RegExp(`^${escapedTitle}$`, 'i') } })
         .exec();
     }
 
@@ -63,16 +64,14 @@ export class CardsService {
       throw new NotFoundException('Không tìm thấy bài tập này');
     }
 
-    const cardId = (card as { _id: unknown })._id;
+    const cardId = card._id;
     const public_test_cases = await this.testCaseModel
       .find({ card_idrd_id: cardId, is_hidden: false })
       .sort({ order: 1 })
       .select('-_id input expected_output order')
       .exec();
 
-    const cardJson = (
-      card as { toJSON: () => Record<string, unknown> }
-    ).toJSON();
+    const cardJson = card.toJSON() as Record<string, unknown>;
     return {
       ...cardJson,
       public_test_cases,

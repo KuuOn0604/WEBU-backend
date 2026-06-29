@@ -25,13 +25,10 @@
     "strict": true,
     "ignoreDeprecations": "6.0",
     "types": ["jest", "node", "multer"],
+    "paths": {
+      "@/*": ["./src/*"]
+    }
   },
-  "include": [
-    "src/**/*"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist",
-    "test"
-  ]
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "test"]
 }
