@@ -85,8 +85,8 @@ export class AiService {
       });
       const imagePart: Part = {
         inlineData: {
-          data: (file.buffer as Buffer).toString('base64'),
-          mimeType: file.mimetype as string,
+          data: file.buffer.toString('base64'),
+          mimeType: file.mimetype,
         },
       };
 
