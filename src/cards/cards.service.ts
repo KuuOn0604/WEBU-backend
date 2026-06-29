@@ -65,7 +65,7 @@ export class CardsService {
 
     const cardId = (card as { _id: unknown })._id;
     const public_test_cases = await this.testCaseModel
-      .find({ card_id: cardId, is_hidden: false })
+      .find({ card_idrd_id: cardId, is_hidden: false })
       .sort({ order: 1 })
       .select('-_id input expected_output order')
       .exec();
