@@ -1,7 +1,8 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
-import { Model, QueryFilter } from 'mongoose';
+import { Model, QueryFilter, Types } from 'mongoose';
 
+import { TestCase } from '../test-cases/schemas/test-cases.schema';
 import { GetCardsFilterDto } from './dto/get-cards-filter.dto';
 import { Card } from './schemas/cards.schema';
 
@@ -9,7 +10,7 @@ import { Card } from './schemas/cards.schema';
 export class CardsService {
   constructor(
     @InjectModel(Card.name) private cardModel: Model<Card>,
-    @InjectModel('TestCase') private testCaseModel: Model<unknown>,
+    @InjectModel(TestCase.name) private testCaseModel: Model<TestCase>,
   ) {}
 
   async findAll(filterDto: GetCardsFilterDto): Promise<{
@@ -48,19 +49,32 @@ export class CardsService {
   }
 
   async findOne(id: string): Promise<unknown> {
-    const card = await this.cardModel.findById(id).exec();
+    let card: (typeof this.cardModel extends Model<infer T> ? T : never) | null;
+    if (Types.ObjectId.isValid(id)) {
+      card = await this.cardModel.findById(id).exec();
+    } else {
+      const titleQuery = id.split('-').join(' ');
+      card = await this.cardModel
+        .findOne({ title: { $regex: new RegExp(`^${titleQuery}$`, 'i') } })
+        .exec();
+    }
+
     if (!card) {
       throw new NotFoundException('Không tìm thấy bài tập này');
     }
 
+    const cardId = (card as { _id: unknown })._id;
     const public_test_cases = await this.testCaseModel
-      .find({ card_id: id, is_hidden: false })
+      .find({ card_id: cardId, is_hidden: false })
       .sort({ order: 1 })
       .select('-_id input expected_output order')
       .exec();
 
+    const cardJson = (
+      card as { toJSON: () => Record<string, unknown> }
+    ).toJSON();
     return {
-      ...card.toJSON(),
+      ...cardJson,
       public_test_cases,
     };
   }

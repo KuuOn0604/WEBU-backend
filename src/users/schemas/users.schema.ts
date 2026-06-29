@@ -25,8 +25,14 @@ export class User extends Document {
   @Prop({ required: true, unique: true })
   email!: string;
 
-  @Prop({ required: true })
-  password_hash!: string;
+  @Prop()
+  password_hash?: string;
+
+  @Prop({ index: true, sparse: true })
+  googleId?: string;
+
+  @Prop()
+  avatar?: string;
 
   @Prop({ type: String, enum: Role, default: Role.USER })
   role!: Role;

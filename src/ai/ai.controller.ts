@@ -1,34 +1,71 @@
+/// <reference types="multer" />
 import {
+  BadRequestException,
   Body,
   Controller,
-  HttpCode,
-  HttpStatus,
   Post,
-  // UseGuards,
+  UploadedFile,
+  UseInterceptors,
 } from '@nestjs/common';
-import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 
-import { GetHintDto } from '@/ai/dto/get-hint.dto';
+import { AiGeneratedProblemResponse, AiService } from './ai.service';
 
-// import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
-import { AiService } from './ai.service';
-
-@ApiTags('AI Tutor')
-@Controller('ai')
-// @UseGuards(JwtAuthGuard)
-@ApiBearerAuth()
+@ApiTags('Ai')
+@Controller('api/ai')
 export class AiController {
   constructor(private readonly aiService: AiService) {}
 
-  @Post('hint')
-  @HttpCode(HttpStatus.OK)
-  async getHint(@Body() getHintDto: GetHintDto): Promise<{ hint: string }> {
-    const hint = await this.aiService.getHintForCode(
-      getHintDto.problem_description,
-      getHintDto.user_code,
-      getHintDto.language,
-    );
+  @Post('generate-problem')
+  @ApiOperation({
+    summary: 'Extract and structure programming problem from an image using AI',
+  })
+  @UseInterceptors(FileInterceptor('image'))
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        image: {
+          type: 'string',
+          format: 'binary',
+          description:
+            'The image file containing the programming problem to be extracted',
+        },
+      },
+      required: ['image'],
+    },
+  })
+  async generateProblem(
+    @UploadedFile() file: Express.Multer.File,
+  ): Promise<AiGeneratedProblemResponse> {
+    if (!file) {
+      throw new BadRequestException(
+        'Image file is required. Please upload a valid image.',
+      );
+    }
+    return this.aiService.generateFromImage(file);
+  }
 
-    return { hint };
+  @Post('chat')
+  @ApiOperation({ summary: 'AI Tutor chat for problem-solving guidance' })
+  async chat(
+    @Body()
+    body: {
+      message: string;
+      problem_title?: string;
+      problem_description?: string;
+    },
+  ): Promise<{ reply: string }> {
+    if (!body.message) {
+      throw new BadRequestException('message is required');
+    }
+    const reply = await this.aiService.chatWithTutor(
+      body.message,
+      body.problem_title ?? 'Unknown Problem',
+      body.problem_description ?? '',
+    );
+    return { reply };
   }
 }

@@ -1,4 +1,5 @@
 import { Test, TestingModule } from '@nestjs/testing';
+
 import { AiController } from './ai.controller';
 
 describe('AiController', () => {
