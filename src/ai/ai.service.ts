@@ -1,9 +1,4 @@
-import {
-  GoogleGenerativeAI,
-  Part,
-  Schema,
-  SchemaType,
-} from '@google/generative-ai';
+import { GoogleGenerativeAI, Schema, SchemaType } from '@google/generative-ai';
 import {
   Injectable,
   InternalServerErrorException,
@@ -18,6 +13,9 @@ export interface AiGeneratedProblemResponse {
   group: string;
   boilerplateCode: {
     cpp: string;
+    java: string;
+    python: string;
+    typescript: string;
   };
 }
 
@@ -45,7 +43,7 @@ export class AiService {
           description: {
             type: SchemaType.STRING,
             description:
-              'Full description of the problem, including requirements, inputs, outputs, and constraints',
+              'Full description of the problem formatted in clean Github-Flavored Markdown. Use headings (e.g. ### Description, ### Input, ### Output), bold text, bullet points for constraints, and clear paragraphs with double newlines (\n\n) to make it highly readable and clean.',
           },
           difficulty: {
             type: SchemaType.STRING,
@@ -70,10 +68,26 @@ export class AiService {
                 description:
                   'The initial C++ boilerplate code or skeleton function for the problem',
               },
+              java: {
+                type: SchemaType.STRING,
+                description:
+                  'The initial Java boilerplate code or skeleton class/method for the problem',
+              },
+              python: {
+                type: SchemaType.STRING,
+                description:
+                  'The initial Python boilerplate code or skeleton function/method for the problem',
+              },
+              typescript: {
+                type: SchemaType.STRING,
+                description:
+                  'The initial TypeScript boilerplate code or skeleton function/method for the problem',
+              },
             },
+            required: ['cpp', 'java', 'python', 'typescript'],
           },
         },
-        required: ['title', 'description', 'difficulty'],
+        required: ['title', 'description', 'difficulty', 'boilerplateCode'],
       };
 
       const model = this.genAI.getGenerativeModel({
@@ -83,7 +97,8 @@ export class AiService {
           responseSchema: aiProblemSchema,
         },
       });
-      const imagePart: Part = {
+
+      const imagePart = {
         inlineData: {
           data: file.buffer.toString('base64'),
           mimeType: file.mimetype,
@@ -91,7 +106,7 @@ export class AiService {
       };
 
       const systemInstruction =
-        'You are an advanced OCR and software engineering assistant. Analyze the provided programming problem image. Extract key details accurately and format the output according to the requested JSON schema.';
+        'You are an advanced OCR and software engineering assistant. Analyze the provided programming problem image. Extract key details accurately, format the description beautifully using clear Markdown sections and spacing, and format the output according to the requested JSON schema.';
 
       const result = await model.generateContent([
         systemInstruction,
