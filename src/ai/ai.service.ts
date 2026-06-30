@@ -48,7 +48,7 @@ export class AiService {
           difficulty: {
             type: SchemaType.STRING,
             description:
-              'Difficulty level, must be exactly one of the following values: Easy, Medium, or Hard',
+              'Difficulty level, must be exactly one of the following values: Easy, Medium, or Hard. If the image has rating numbers like *900 or division tags, map them: rating < 1200 is Easy, 1200-1700 is Medium, > 1700 is Hard.',
           },
           tags: {
             type: SchemaType.ARRAY,
@@ -58,7 +58,7 @@ export class AiService {
           group: {
             type: SchemaType.STRING,
             description:
-              "The course category, must be exactly either 'KTLT' or 'DSA'",
+              "The course category, must be exactly either 'KTLT' or 'DSA'. Default to 'DSA' if unsure.",
           },
           boilerplateCode: {
             type: SchemaType.OBJECT,
@@ -66,22 +66,22 @@ export class AiService {
               cpp: {
                 type: SchemaType.STRING,
                 description:
-                  'The initial C++ boilerplate code or skeleton function for the problem',
+                  'The initial C++20 boilerplate code or skeleton function/main program for the problem',
               },
               java: {
                 type: SchemaType.STRING,
                 description:
-                  'The initial Java boilerplate code or skeleton class/method for the problem',
+                  'The initial Java 17 boilerplate code or skeleton class/method/main program for the problem',
               },
               python: {
                 type: SchemaType.STRING,
                 description:
-                  'The initial Python boilerplate code or skeleton function/method for the problem',
+                  'The initial Python 3 boilerplate code or skeleton function/method/main program for the problem',
               },
               typescript: {
                 type: SchemaType.STRING,
                 description:
-                  'The initial TypeScript boilerplate code or skeleton function/method for the problem',
+                  'The initial TypeScript boilerplate code or skeleton function/main program for the problem.',
               },
             },
             required: ['cpp', 'java', 'python', 'typescript'],
@@ -106,7 +106,16 @@ export class AiService {
       };
 
       const systemInstruction =
-        'You are an advanced OCR and software engineering assistant. Analyze the provided programming problem image. Extract key details accurately, format the description beautifully using clear Markdown sections and spacing, and format the output according to the requested JSON schema.';
+        'You are an advanced OCR and software engineering assistant. Analyze the provided programming problem image. Extract key details accurately, format the description beautifully using clear Markdown sections and spacing, and format the output according to the requested JSON schema.\n\n' +
+        'IMPORTANT CRITERIA FOR BOILERPLATE CODE:\n' +
+        '1. The problem image can be LeetCode-style (which uses class/method structures) or Codeforces/Competitive Programming-style (which reads from standard input/stdin and writes to standard output/stdout).\n' +
+        '2. For Codeforces/Competitive Programming style: Since there is no predefined function signature, the boilerplateCode for each language MUST be a complete runnable program template that reads inputs from stdin (e.g., using cin/Scanner/sys.stdin/readline), processes them, and prints results to stdout.\n' +
+        '3. For LeetCode style: The boilerplateCode should be the typical class or function skeleton structure.\n' +
+        '4. LANGUAGE SPECIFIC VERSIONS AND RULES:\n' +
+        '   - cpp: Generate C++20 boilerplate.\n' +
+        '   - java: Generate Java 17 boilerplate.\n' +
+        '   - python: Generate Python 3 boilerplate.\n' +
+        '   - typescript: Generate TypeScript boilerplate.';
 
       const result = await model.generateContent([
         systemInstruction,
