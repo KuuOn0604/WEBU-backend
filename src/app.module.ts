@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CardsModule } from './cards/cards.module';
+import { FsrsModule } from './fsrs/fsrs.module';
 import { Judge0Module } from './judge0/judge0.module';
 import { SubmissionsModule } from './submissions/submissions.module';
 import { TestCasesModule } from './test-cases/test-cases.module';
@@ -49,6 +50,7 @@ import { UsersModule } from './users/users.module';
     AiModule,
     AuthModule,
     AiModule,
+    FsrsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
