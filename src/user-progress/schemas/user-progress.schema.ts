@@ -25,19 +25,19 @@ export class UserProgress extends Document {
   @Prop({ default: 0 })
   total_hints_used!: number;
 
-  @Prop({ type: String, enum: State, default: State.NEW })
+  @Prop({ type: Number, enum: [0, 1, 2, 3], default: 0 })
   state!: State;
 
-  @Prop()
+  @Prop({ type: Number })
   difficulty?: number;
 
-  @Prop()
+  @Prop({ type: Number })
   stability?: number;
 
-  @Prop({ default: 0 })
+  @Prop({ type: Number, default: 0 })
   reps!: number;
 
-  @Prop({ default: 0 })
+  @Prop({ type: Number, default: 0 })
   lapses!: number;
 
   @Prop()
