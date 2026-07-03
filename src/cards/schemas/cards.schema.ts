@@ -43,7 +43,7 @@ export class Card extends Document {
   title!: string;
 
   @Prop()
-  group!: string;
+  course!: string;
 
   @Prop([String])
   tags!: string[];
