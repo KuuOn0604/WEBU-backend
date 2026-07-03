@@ -103,16 +103,16 @@ export class AiService {
       const systemInstruction =
         'You are an advanced OCR and software engineering assistant. Analyze the provided programming problem details (which can be in the form of an image, a text prompt, or both). Extract or generate key details accurately, format the description beautifully using clear Markdown sections and spacing, and format the output according to the requested JSON schema.\n\n' +
         'IMPORTANT CRITERIA FOR BOILERPLATE CODE:\n' +
-        '1. The problem can be LeetCode-style (which uses class/method structures) or Codeforces/Competitive Programming-style (which reads from standard input/stdin and writes to standard output/stdout).\n' +
-        '2. For Codeforces/Competitive Programming style: Since there is no predefined function signature, the boilerplateCode for each language MUST be a complete runnable program template that reads inputs from stdin (e.g., using cin/Scanner/sys.stdin/readline), processes them, and prints results to stdout.\n' +
-        '3. For LeetCode style: The boilerplateCode should be the typical class or function skeleton structure.\n' +
+        '1. For ALL languages (cpp, java, python, typescript): The boilerplate code MUST be a complete, fully runnable program template.\n' +
+        '2. It MUST include all necessary imports/includes, the core solution logic class/method, and a complete main function (or entry point) that automatically reads inputs from standard input (stdin) matching the testcase format, parses them into correct types, calls the solution method, and prints the exact expected output to standard output (stdout).\n' +
+        '3. Inside the solution method, mark the region where the user should write their code with a concise and professional comment: "// TODO: Implement your solution here" (or equivalent syntax for python/other languages).\n' +
         '4. LANGUAGE SPECIFIC VERSIONS AND RULES:\n' +
         '   - cpp: Generate C++20 boilerplate.\n' +
         '   - java: Generate Java 17 boilerplate.\n' +
         '   - python: Generate Python 3 boilerplate.\n' +
         '   - typescript: Generate TypeScript boilerplate.';
 
-      const contents: any[] = [systemInstruction];
+      const contents: unknown[] = [systemInstruction];
 
       if (file) {
         contents.push({
@@ -137,7 +137,10 @@ export class AiService {
     }
   }
 
-  async generateTestCases(title: string, description: string): Promise<any[]> {
+  async generateTestCases(
+    title: string,
+    description: string,
+  ): Promise<unknown[]> {
     try {
       const testCasesSchema: Schema = {
         type: SchemaType.ARRAY,
@@ -185,7 +188,7 @@ The hidden cases should cover typical boundaries, empty or large values, negativ
 Make sure the expected outputs are 100% correct according to the description logic.`;
 
       const result = await model.generateContent(prompt);
-      return JSON.parse(result.response.text()) as any[];
+      return JSON.parse(result.response.text()) as unknown[];
     } catch (error) {
       this.logger.error('Failed to generate test cases:', error);
       throw new InternalServerErrorException(

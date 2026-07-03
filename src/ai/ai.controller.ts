@@ -65,7 +65,7 @@ export class AiController {
       title: string;
       description: string;
     },
-  ): Promise<any[]> {
+  ): Promise<unknown[]> {
     if (!body.title || !body.description) {
       throw new BadRequestException('title and description are required');
     }

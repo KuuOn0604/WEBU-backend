@@ -1,5 +1,5 @@
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
-import { Document } from 'mongoose';
+import { Document, Types } from 'mongoose';
 
 import { DifficultyLevel } from '../../common/enums/difficulty-level.enum';
 
@@ -60,6 +60,9 @@ export class Card extends Document {
     default: DifficultyLevel.MEDIUM,
   })
   difficulty_level!: DifficultyLevel;
+
+  @Prop({ type: Types.ObjectId, ref: 'User', index: true })
+  created_by?: Types.ObjectId;
 }
 
 export const CardSchema = SchemaFactory.createForClass(Card);

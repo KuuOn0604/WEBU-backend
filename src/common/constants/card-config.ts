@@ -1,12 +1,13 @@
 export const CARD_TAGS = [
   'Array',
+  'Linked List',
+  'Stack',
+  'Backtracking',
+  'Dynamic Programming',
   'String',
   'Math',
-  'Sorting',
   'Two Pointers',
   'Binary Search',
-  'DP ',
-  'DFS/BFS',
   'Greedy',
   'Hash Table',
 ];
