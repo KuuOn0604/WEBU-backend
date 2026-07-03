@@ -19,7 +19,8 @@ export class AiController {
 
   @Post('generate-problem')
   @ApiOperation({
-    summary: 'Extract and structure programming problem from an image using AI',
+    summary:
+      'Extract and structure programming problem from an image and/or text prompt using AI',
   })
   @UseInterceptors(FileInterceptor('image'))
   @ApiConsumes('multipart/form-data')
@@ -31,21 +32,44 @@ export class AiController {
           type: 'string',
           format: 'binary',
           description:
-            'The image file containing the programming problem to be extracted',
+            'The image file containing the programming problem to be extracted (optional)',
+        },
+        prompt: {
+          type: 'string',
+          description:
+            'Text instructions or direct prompt for problem generation (optional)',
         },
       },
-      required: ['image'],
     },
   })
   async generateProblem(
-    @UploadedFile() file: Express.Multer.File,
+    @UploadedFile() file?: Express.Multer.File,
+    @Body('prompt') prompt?: string,
   ): Promise<AiGeneratedProblemResponse> {
-    if (!file) {
+    if (!file && (!prompt || !prompt.trim())) {
       throw new BadRequestException(
-        'Image file is required. Please upload a valid image.',
+        'Either an image file or a prompt is required.',
       );
     }
-    return this.aiService.generateFromImage(file);
+    return this.aiService.generateFromImage(file, prompt);
+  }
+
+  @Post('generate-testcases')
+  @ApiOperation({
+    summary:
+      'Generate sample and hidden test cases for a programming problem using AI',
+  })
+  async generateTestCases(
+    @Body()
+    body: {
+      title: string;
+      description: string;
+    },
+  ): Promise<unknown[]> {
+    if (!body.title || !body.description) {
+      throw new BadRequestException('title and description are required');
+    }
+    return this.aiService.generateTestCases(body.title, body.description);
   }
 
   @Post('chat')

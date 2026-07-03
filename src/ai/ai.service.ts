@@ -5,12 +5,14 @@ import {
   Logger,
 } from '@nestjs/common';
 
+import { CARD_TAGS } from '../common/constants/card-config';
+
 export interface AiGeneratedProblemResponse {
   title: string;
   description: string;
   difficulty: string;
   tags: string[];
-  group: string;
+  course: string;
   boilerplateCode: {
     cpp: string;
     java: string;
@@ -29,7 +31,8 @@ export class AiService {
   }
 
   async generateFromImage(
-    file: Express.Multer.File,
+    file?: Express.Multer.File,
+    prompt?: string,
   ): Promise<AiGeneratedProblemResponse> {
     try {
       const aiProblemSchema: Schema = {
@@ -38,7 +41,7 @@ export class AiService {
           title: {
             type: SchemaType.STRING,
             description:
-              'A concise title of the programming problem extracted from the image',
+              'A concise title of the programming problem extracted from the image or prompt',
           },
           description: {
             type: SchemaType.STRING,
@@ -53,12 +56,11 @@ export class AiService {
           tags: {
             type: SchemaType.ARRAY,
             items: { type: SchemaType.STRING },
-            description: 'An array of relevant algorithmic or topic tags',
+            description: `An array of relevant algorithmic or topic tags. You MUST ONLY choose tags from the following allowed list: ${CARD_TAGS.join(', ')}. If any tags are identified that are not in this list, omit them.`,
           },
-          group: {
+          course: {
             type: SchemaType.STRING,
-            description:
-              "The course category, must be exactly either 'KTLT' or 'DSA'. Default to 'DSA' if unsure.",
+            description: `The course category, must be exactly either 'KTLT' or 'DSA'. If the image, prompt, or description does not explicitly mention either 'KTLT' or 'DSA', return an empty string.`,
           },
           boilerplateCode: {
             type: SchemaType.OBJECT,
@@ -98,35 +100,99 @@ export class AiService {
         },
       });
 
-      const imagePart = {
-        inlineData: {
-          data: file.buffer.toString('base64'),
-          mimeType: file.mimetype,
-        },
-      };
-
       const systemInstruction =
-        'You are an advanced OCR and software engineering assistant. Analyze the provided programming problem image. Extract key details accurately, format the description beautifully using clear Markdown sections and spacing, and format the output according to the requested JSON schema.\n\n' +
+        'You are an advanced OCR and software engineering assistant. Analyze the provided programming problem details (which can be in the form of an image, a text prompt, or both). Extract or generate key details accurately, format the description beautifully using clear Markdown sections and spacing, and format the output according to the requested JSON schema.\n\n' +
         'IMPORTANT CRITERIA FOR BOILERPLATE CODE:\n' +
-        '1. The problem image can be LeetCode-style (which uses class/method structures) or Codeforces/Competitive Programming-style (which reads from standard input/stdin and writes to standard output/stdout).\n' +
-        '2. For Codeforces/Competitive Programming style: Since there is no predefined function signature, the boilerplateCode for each language MUST be a complete runnable program template that reads inputs from stdin (e.g., using cin/Scanner/sys.stdin/readline), processes them, and prints results to stdout.\n' +
-        '3. For LeetCode style: The boilerplateCode should be the typical class or function skeleton structure.\n' +
+        '1. For ALL languages (cpp, java, python, typescript): The boilerplate code MUST be a complete, fully runnable program template.\n' +
+        '2. It MUST include all necessary imports/includes, the core solution logic class/method, and a complete main function (or entry point) that automatically reads inputs from standard input (stdin) matching the testcase format, parses them into correct types, calls the solution method, and prints the exact expected output to standard output (stdout).\n' +
+        '3. Inside the solution method, mark the region where the user should write their code with a concise and professional comment: "// TODO: Implement your solution here" (or equivalent syntax for python/other languages).\n' +
         '4. LANGUAGE SPECIFIC VERSIONS AND RULES:\n' +
         '   - cpp: Generate C++20 boilerplate.\n' +
         '   - java: Generate Java 17 boilerplate.\n' +
         '   - python: Generate Python 3 boilerplate.\n' +
         '   - typescript: Generate TypeScript boilerplate.';
 
-      const result = await model.generateContent([
-        systemInstruction,
-        imagePart,
-      ]);
+      const contents: unknown[] = [systemInstruction];
 
+      if (file) {
+        contents.push({
+          inlineData: {
+            data: file.buffer.toString('base64'),
+            mimeType: file.mimetype,
+          },
+        });
+      }
+
+      if (prompt) {
+        contents.push(`User request/prompt: ${prompt}`);
+      }
+
+      const result = await model.generateContent(contents);
       return JSON.parse(result.response.text()) as AiGeneratedProblemResponse;
     } catch (error) {
       this.logger.error('Gemini Service Error:', error);
       throw new InternalServerErrorException(
-        'Failed to process the image. Please try again with a clearer image or check the service availability.',
+        'Failed to process the input. Please try again with a clearer prompt or image.',
+      );
+    }
+  }
+
+  async generateTestCases(
+    title: string,
+    description: string,
+  ): Promise<unknown[]> {
+    try {
+      const testCasesSchema: Schema = {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            input: {
+              type: SchemaType.STRING,
+              description:
+                'The exact input string for the testcase as it would be read from standard input.',
+            },
+            expected_output: {
+              type: SchemaType.STRING,
+              description:
+                'The exact expected output string from the program as it would be printed to standard output.',
+            },
+            is_hidden: {
+              type: SchemaType.BOOLEAN,
+              description:
+                'True if it is a hidden edge case, false if it is one of the 3 sample test cases.',
+            },
+            order: {
+              type: SchemaType.INTEGER,
+              description: 'The sequential 1-based order of the test case.',
+            },
+          },
+          required: ['input', 'expected_output', 'is_hidden', 'order'],
+        },
+      };
+
+      const model = this.genAI.getGenerativeModel({
+        model: 'gemini-2.5-flash',
+        generationConfig: {
+          responseMimeType: 'application/json',
+          responseSchema: testCasesSchema,
+        },
+      });
+
+      const prompt = `Generate test cases for the programming problem: "${title}".
+Description:
+${description}
+
+Generate exactly 3 sample test cases (where \`is_hidden\` is \`false\`) and 3 to 5 hidden edge cases (where \`is_hidden\` is \`true\`).
+The hidden cases should cover typical boundaries, empty or large values, negatives, or other tricky inputs.
+Make sure the expected outputs are 100% correct according to the description logic.`;
+
+      const result = await model.generateContent(prompt);
+      return JSON.parse(result.response.text()) as unknown[];
+    } catch (error) {
+      this.logger.error('Failed to generate test cases:', error);
+      throw new InternalServerErrorException(
+        'Failed to generate test cases. Please check the problem description and try again.',
       );
     }
   }
