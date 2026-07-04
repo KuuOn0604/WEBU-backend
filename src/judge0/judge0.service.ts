@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import axios, { AxiosInstance } from 'axios';
 
@@ -90,11 +90,18 @@ export class Judge0Service {
       const status = (err as { response?: { status?: number } })?.response
         ?.status;
       if (status === 401 || status === 403) {
-        throw new Error(
-          'Judge0 API key is invalid. Please set JUDGE0_RAPIDAPI_KEY in .env',
+        throw new HttpException(
+          'Judge0 API key is invalid or not subscribed. Please set JUDGE0_RAPIDAPI_KEY in .env and subscribe to the API on RapidAPI.',
+          HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-      throw err;
+      const errMsg = axios.isAxiosError(err)
+        ? (err.response?.data as { message?: string })?.message || err.message
+        : err instanceof Error ? err.message : 'Unknown error';
+      throw new HttpException(
+        'Failed to submit code to Judge0: ' + errMsg,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     return this.pollResult(submitToken);
@@ -135,11 +142,18 @@ export class Judge0Service {
         return this.pollResult(token, attempts + 1);
       }
       if (status === 401 || status === 403) {
-        throw new Error(
-          'Judge0 API key is invalid or expired. Please check JUDGE0_RAPIDAPI_KEY in .env',
+        throw new HttpException(
+          'Judge0 API key is invalid, expired, or not subscribed. Please check JUDGE0_RAPIDAPI_KEY in .env and your RapidAPI subscription.',
+          HttpStatus.INTERNAL_SERVER_ERROR,
         );
       }
-      throw err;
+      const errMsg = axios.isAxiosError(err)
+        ? (err.response?.data as { message?: string })?.message || err.message
+        : err instanceof Error ? err.message : 'Unknown error';
+      throw new HttpException(
+        'Failed to poll result from Judge0: ' + errMsg,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
     }
 
     // status 1 = In Queue, 2 = Processing
@@ -180,17 +194,35 @@ export class Judge0Service {
       expected_output: Buffer.from(tc.expected_output).toString('base64'),
     }));
 
-    // Submit batch
-    const batchRes = await this.client.post<{ token: string }[]>(
-      '/submissions/batch',
-      { submissions },
-      { params: { base64_encoded: 'true' } },
-    );
+    try {
+      // Submit batch
+      const batchRes = await this.client.post<{ token: string }[]>(
+        '/submissions/batch',
+        { submissions },
+        { params: { base64_encoded: 'true' } },
+      );
 
-    const tokens = batchRes.data.map((r) => r.token);
+      const tokens = batchRes.data.map((r) => r.token);
 
-    // Poll all results
-    return Promise.all(tokens.map((token) => this.pollResult(token)));
+      // Poll all results
+      return Promise.all(tokens.map((token) => this.pollResult(token)));
+    } catch (err: unknown) {
+      const status = (err as { response?: { status?: number } })?.response
+        ?.status;
+      if (status === 401 || status === 403) {
+        throw new HttpException(
+          'Judge0 API key is invalid, expired, or not subscribed. Please check JUDGE0_RAPIDAPI_KEY in .env and your RapidAPI subscription.',
+          HttpStatus.INTERNAL_SERVER_ERROR,
+        );
+      }
+      const errMsg = axios.isAxiosError(err)
+        ? (err.response?.data as { message?: string })?.message || err.message
+        : err instanceof Error ? err.message : 'Unknown error';
+      throw new HttpException(
+        'Failed to execute batch on Judge0: ' + errMsg,
+        HttpStatus.INTERNAL_SERVER_ERROR,
+      );
+    }
   }
 
   getLanguageId(language: string): number {

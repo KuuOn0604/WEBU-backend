@@ -42,4 +42,20 @@ export class GetCardsFilterDto {
   @IsOptional()
   @IsEnum(DifficultyLevel)
   difficulty_level?: DifficultyLevel;
+
+  @ApiPropertyOptional({
+    description: 'Tìm kiếm theo tiêu đề bài tập (không phân biệt hoa thường)',
+    example: 'two sum',
+  })
+  @IsOptional()
+  @IsString()
+  search?: string;
+
+  @ApiPropertyOptional({
+    description: 'Lọc theo nhóm bài tập',
+    example: 'Arrays & Hashing',
+  })
+  @IsOptional()
+  @IsString()
+  group?: string;
 }

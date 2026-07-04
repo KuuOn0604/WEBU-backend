@@ -26,7 +26,14 @@ export class CardsService {
       total_pages: number;
     };
   }> {
-    const { page = 1, limit = 10, tags, difficulty_level } = filterDto;
+    const {
+      page = 1,
+      limit = 10,
+      tags,
+      difficulty_level,
+      search,
+      group,
+    } = filterDto;
     const query: Record<string, unknown> = {};
 
     if (userId) {
@@ -45,6 +52,12 @@ export class CardsService {
     if (difficulty_level) {
       query.difficulty_level =
         difficulty_level.toLowerCase() as DifficultyLevel;
+    }
+    if (search) {
+      query.title = { $regex: search, $options: 'i' };
+    }
+    if (group) {
+      query.group = group;
     }
 
     const skip = (page - 1) * limit;
@@ -113,7 +126,7 @@ export class CardsService {
       throw new NotFoundException('Không tìm thấy bài tập này');
     }
 
-    const cardId = card._id;
+    const cardId = (card as { _id: Types.ObjectId })._id;
     const public_test_cases = await this.testCaseModel
       .find({ card_id: cardId, is_hidden: false })
       .sort({ order: 1 })
