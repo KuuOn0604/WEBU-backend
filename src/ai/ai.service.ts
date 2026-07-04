@@ -1,4 +1,9 @@
-import { GoogleGenerativeAI, Schema, SchemaType } from '@google/generative-ai';
+import {
+  GoogleGenerativeAI,
+  Part,
+  Schema,
+  SchemaType,
+} from '@google/generative-ai';
 import {
   Injectable,
   InternalServerErrorException,
@@ -112,7 +117,7 @@ export class AiService {
         '   - python: Generate Python 3 boilerplate.\n' +
         '   - typescript: Generate TypeScript boilerplate.';
 
-      const contents: unknown[] = [systemInstruction];
+      const contents: (string | Part)[] = [systemInstruction];
 
       if (file) {
         contents.push({
