@@ -219,8 +219,8 @@ export class SubmissionsService {
   ): Promise<Submission[]> {
     return this.submissionModel
       .find({
-        card_id: new Types.ObjectId(cardId),
-        user_id: new Types.ObjectId(userId),
+        card_id: cardId,
+        user_id: userId,
       })
       .sort({ submitted_at: -1 })
       .limit(20)

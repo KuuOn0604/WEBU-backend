@@ -29,10 +29,12 @@ export class CreateCardDto {
   @IsString({ each: true })
   tags!: string[];
 
-  @ApiProperty()
-  @IsNotEmpty()
+  @ApiPropertyOptional({
+    description: 'Nhóm bài học',
+  })
+  @IsOptional()
   @IsString()
-  course!: string;
+  course?: string;
 
   @ApiProperty()
   @IsNotEmpty()
