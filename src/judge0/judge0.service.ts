@@ -97,7 +97,9 @@ export class Judge0Service {
       }
       const errMsg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string })?.message || err.message
-        : err instanceof Error ? err.message : 'Unknown error';
+        : err instanceof Error
+          ? err.message
+          : 'Unknown error';
       throw new HttpException(
         'Failed to submit code to Judge0: ' + errMsg,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -149,7 +151,9 @@ export class Judge0Service {
       }
       const errMsg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string })?.message || err.message
-        : err instanceof Error ? err.message : 'Unknown error';
+        : err instanceof Error
+          ? err.message
+          : 'Unknown error';
       throw new HttpException(
         'Failed to poll result from Judge0: ' + errMsg,
         HttpStatus.INTERNAL_SERVER_ERROR,
@@ -217,7 +221,9 @@ export class Judge0Service {
       }
       const errMsg = axios.isAxiosError(err)
         ? (err.response?.data as { message?: string })?.message || err.message
-        : err instanceof Error ? err.message : 'Unknown error';
+        : err instanceof Error
+          ? err.message
+          : 'Unknown error';
       throw new HttpException(
         'Failed to execute batch on Judge0: ' + errMsg,
         HttpStatus.INTERNAL_SERVER_ERROR,
