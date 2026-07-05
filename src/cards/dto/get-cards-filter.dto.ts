@@ -58,4 +58,12 @@ export class GetCardsFilterDto {
   @IsOptional()
   @IsString()
   group?: string;
+
+  @ApiPropertyOptional({
+    description: 'Phạm vi tìm kiếm bài tập (system hoặc user)',
+    enum: ['system', 'user'],
+  })
+  @IsOptional()
+  @IsString()
+  scope?: string;
 }

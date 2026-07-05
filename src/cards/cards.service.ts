@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
 import { DifficultyLevel } from '../common/enums/difficulty-level.enum';
+import { Submission } from '../submissions/schemas/submissions.schema';
 import { TestCase } from '../test-cases/schemas/test-cases.schema';
 import { CreateCardDto } from './dto/create-card.dto';
 import { GetCardsFilterDto } from './dto/get-cards-filter.dto';
@@ -13,6 +14,7 @@ export class CardsService {
   constructor(
     @InjectModel(Card.name) private cardModel: Model<Card>,
     @InjectModel(TestCase.name) private testCaseModel: Model<TestCase>,
+    @InjectModel(Submission.name) private submissionModel: Model<Submission>,
   ) {}
 
   async findAll(
@@ -33,17 +35,37 @@ export class CardsService {
       difficulty_level,
       search,
       group,
+      scope,
     } = filterDto;
     const query: Record<string, unknown> = {};
 
-    if (userId) {
-      query.$or = [
-        { created_by: { $exists: false } },
-        { created_by: null },
-        { created_by: new Types.ObjectId(userId) },
-      ];
-    } else {
+    if (scope === 'user') {
+      if (userId) {
+        const submittedCardIds = await this.submissionModel.distinct(
+          'card_id',
+          {
+            user_id: new Types.ObjectId(userId),
+          },
+        );
+        query.$or = [
+          { created_by: new Types.ObjectId(userId) },
+          { _id: { $in: submittedCardIds } },
+        ];
+      } else {
+        query.created_by = new Types.ObjectId();
+      }
+    } else if (scope === 'system') {
       query.$or = [{ created_by: { $exists: false } }, { created_by: null }];
+    } else {
+      if (userId) {
+        query.$or = [
+          { created_by: { $exists: false } },
+          { created_by: null },
+          { created_by: new Types.ObjectId(userId) },
+        ];
+      } else {
+        query.$or = [{ created_by: { $exists: false } }, { created_by: null }];
+      }
     }
 
     if (tags) {

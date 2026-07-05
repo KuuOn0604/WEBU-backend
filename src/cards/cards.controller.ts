@@ -59,7 +59,7 @@ export class CardsController {
     if (authHeader && authHeader.startsWith('Bearer ')) {
       try {
         const token = authHeader.split(' ')[1];
-        const payload = this.jwtService.verify(token) as unknown as JwtPayload;
+        const payload = await this.jwtService.verifyAsync<JwtPayload>(token);
         userId = payload.sub;
       } catch {
         // Token invalid or expired, ignore and treat as guest
