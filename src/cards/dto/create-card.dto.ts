@@ -1,4 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
 import {
   IsArray,
   IsEnum,
@@ -17,6 +18,9 @@ export class CreateCardDto {
 
   @ApiProperty()
   @IsNotEmpty()
+  @Transform(({ value }: { value: unknown }) =>
+    typeof value === 'string' ? value.toLowerCase() : value,
+  )
   @IsEnum(DifficultyLevel)
   difficulty_level!: DifficultyLevel;
 

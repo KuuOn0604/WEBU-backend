@@ -99,9 +99,9 @@ export class CardsService {
     if (createCardDto.testcases && createCardDto.testcases.length > 0) {
       const testCaseDocs = createCardDto.testcases.map((tc, index) => ({
         card_id: savedCard._id,
-        input: tc.input,
-        expected_output: tc.expected_output,
-        is_hidden: tc.is_hidden,
+        input: tc.input ?? '',
+        expected_output: tc.expected_output ?? '',
+        is_hidden: tc.is_hidden ?? false,
         order: index + 1,
       }));
       await this.testCaseModel.insertMany(testCaseDocs);

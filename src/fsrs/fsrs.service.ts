@@ -30,7 +30,7 @@ export class FsrsService {
     const currentFsrsCard = progress
       ? {
           due: progress.next_review_date || now,
-          state: progress.state as unknown as number,
+          state: progress.state as number,
           difficulty: progress.difficulty || 0,
           stability: progress.stability || 0,
           reps: progress.reps,

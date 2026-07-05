@@ -1,6 +1,6 @@
 export enum State {
-  NEW = 'new',
-  LEARNING = 'learning',
-  REVIEW = 'review',
-  RELEARNING = 'relearning',
+  NEW = 0,
+  LEARNING = 1,
+  REVIEW = 2,
+  RELEARNING = 3,
 }

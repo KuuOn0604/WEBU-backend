@@ -9,6 +9,21 @@ import { CreateUserProgressDto } from './dto/create-user-progress.dto';
 import { UpdateUserProgressDto } from './dto/update-user-progress.dto';
 import { UserProgress } from './schemas/user-progress.schema';
 
+export interface FsrsProgressItem {
+  card_id: string;
+  title: string;
+  tags: string[];
+  difficulty_level: string;
+  state: 'new' | 'learning' | 'review' | 'relearning';
+  reps: number;
+  lapses: number;
+  stability: number | null;
+  scheduled_days: number | null;
+  last_reviewed_at: Date | null;
+  next_review_date: Date | null;
+  last_rating: LastRating | null;
+}
+
 @Injectable()
 export class UserProgressService {
   constructor(
@@ -251,5 +266,47 @@ export class UserProgressService {
       total_cards_mastered,
       average_retention_rate,
     };
+  }
+
+  /**
+   * Lấy danh sách FSRS progress đầy đủ kèm thông tin card (cho trang Statistics)
+   */
+  async getFsrsProgressList(userId: string): Promise<FsrsProgressItem[]> {
+    const progressList = await this.userProgressModel
+      .find({ user_id: new Types.ObjectId(userId) })
+      .populate('card_id')
+      .sort({ next_review_date: 1 })
+      .exec();
+
+    return progressList
+      .filter((p) => p.card_id)
+      .map((p) => {
+        const card = p.card_id as unknown as Card;
+        return {
+          card_id: card._id.toString(),
+          title: card.title,
+          tags: card.tags ?? [],
+          difficulty_level: card.difficulty_level,
+          state: (() => {
+            const stateMap: Record<
+              number,
+              'new' | 'learning' | 'review' | 'relearning'
+            > = {
+              0: 'new',
+              1: 'learning',
+              2: 'review',
+              3: 'relearning',
+            };
+            return stateMap[p.state as number] || 'new';
+          })(),
+          reps: p.reps,
+          lapses: p.lapses,
+          stability: p.stability ?? null,
+          scheduled_days: p.scheduled_days ?? null,
+          last_reviewed_at: p.last_reviewed_at ?? null,
+          next_review_date: p.next_review_date ?? null,
+          last_rating: p.last_rating ?? null,
+        };
+      });
   }
 }

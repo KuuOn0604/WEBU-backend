@@ -13,9 +13,10 @@ import { ApiBearerAuth } from '@nestjs/swagger';
 import { CurrentUser } from '../auth/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import type { JwtPayload } from '../auth/interfaces/jwt-payload.interface';
+import { FsrsProgressItem } from '../user-progress/user-progress.service';
 import { OnboardingSetupDto } from './dto/onboarding-setup.dto';
 import { ReviewCardDto } from './dto/review-card.dto';
-import { UsersService } from './users.service';
+import { ExtendedStats, SkillStat, UsersService } from './users.service';
 
 @Controller('users')
 export class UsersController {
@@ -63,18 +64,29 @@ export class UsersController {
     return this.usersService.reviewCard(user.sub, cardId, reviewCardDto.rating);
   }
 
-  // Xem Dashboard thống kê
+  // Xem Dashboard thống kê mở rộng
   @Get('me/stats')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  getStats(@CurrentUser() user: JwtPayload): Promise<{
-    total_cards_mastered: number;
-    average_retention_rate: number;
-    submission_history: {
-      date: string;
-      count: number;
-    }[];
-  }> {
+  getStats(@CurrentUser() user: JwtPayload): Promise<ExtendedStats> {
     return this.usersService.getStats(user.sub);
+  }
+
+  // Thống kê kỹ năng theo tag (Skill Radar Chart)
+  @Get('me/skill-stats')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  getSkillStats(@CurrentUser() user: JwtPayload): Promise<SkillStat[]> {
+    return this.usersService.getSkillStats(user.sub);
+  }
+
+  // FSRS progress list (cho Statistics table)
+  @Get('me/fsrs-progress')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  getFsrsProgress(
+    @CurrentUser() user: JwtPayload,
+  ): Promise<FsrsProgressItem[]> {
+    return this.usersService.getFsrsProgress(user.sub);
   }
 }

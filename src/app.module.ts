@@ -8,6 +8,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { AuthModule } from './auth/auth.module';
 import { CardsModule } from './cards/cards.module';
+import { FlashcardsModule } from './flashcards/flashcards.module';
 import { FsrsModule } from './fsrs/fsrs.module';
 import { Judge0Module } from './judge0/judge0.module';
 import { SubmissionsModule } from './submissions/submissions.module';
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module';
     UserProgressModule,
     SubmissionsModule,
     Judge0Module,
+    FlashcardsModule,
     MongooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],
@@ -49,7 +51,6 @@ import { UsersModule } from './users/users.module';
     }),
     AiModule,
     AuthModule,
-    AiModule,
     FsrsModule,
   ],
   controllers: [AppController],

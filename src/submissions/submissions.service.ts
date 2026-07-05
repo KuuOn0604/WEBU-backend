@@ -184,8 +184,8 @@ export class SubmissionsService {
 
     // Lưu vào DB
     const submission = new this.submissionModel({
-      user_id: userId,
-      card_id,
+      user_id: new Types.ObjectId(userId),
+      card_id: new Types.ObjectId(card_id),
       submitted_code,
       language,
       status,

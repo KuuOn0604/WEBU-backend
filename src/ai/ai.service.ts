@@ -26,6 +26,13 @@ export interface AiGeneratedProblemResponse {
   };
 }
 
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correct_index: number;
+  explanation: string;
+}
+
 @Injectable()
 export class AiService {
   private readonly logger = new Logger(AiService.name);
@@ -51,7 +58,7 @@ export class AiService {
           description: {
             type: SchemaType.STRING,
             description:
-              'Full description of the problem formatted in clean Github-Flavored Markdown. Use headings (e.g. ### Description, ### Input, ### Output), bold text, bullet points for constraints, and clear paragraphs with double newlines (\n\n) to make it highly readable and clean.',
+              'Full description of the problem formatted in clean Github-Flavored Markdown. Use headings (e.g. ### Description, ### Input, ### Output), bold text, bullet points for constraints, and clear paragraphs with double newlines (\\n\\n) to make it highly readable and clean.',
           },
           difficulty: {
             type: SchemaType.STRING,
@@ -236,6 +243,78 @@ Câu hỏi của học viên: ${message}`;
     } catch (error) {
       this.logger.error('AI Tutor Chat Error:', error);
       return 'Xin lỗi, mình không thể kết nối đến AI lúc này. Vui lòng thử lại sau nhé!';
+    }
+  }
+
+  /**
+   * Sinh quiz trắc nghiệm để ôn tập kiến thức sau khi submit passed
+   */
+  async generateFlashcardQuiz(
+    problemTitle: string,
+    problemDescription: string,
+    tags: string[],
+  ): Promise<QuizQuestion[]> {
+    try {
+      const quizSchema: Schema = {
+        type: SchemaType.ARRAY,
+        items: {
+          type: SchemaType.OBJECT,
+          properties: {
+            question: {
+              type: SchemaType.STRING,
+              description:
+                'A concise, specific multiple-choice question about the algorithm, data structure, or optimization technique used in this problem.',
+            },
+            options: {
+              type: SchemaType.ARRAY,
+              items: { type: SchemaType.STRING },
+              description: 'Exactly 4 answer options (A, B, C, D).',
+            },
+            correct_index: {
+              type: SchemaType.INTEGER,
+              description:
+                'Zero-based index of the correct answer (0=A, 1=B, 2=C, 3=D).',
+            },
+            explanation: {
+              type: SchemaType.STRING,
+              description:
+                'A brief, clear explanation (1-2 sentences) of why the correct answer is right.',
+            },
+          },
+          required: ['question', 'options', 'correct_index', 'explanation'],
+        },
+      };
+
+      const model = this.genAI.getGenerativeModel({
+        model: 'gemini-2.5-flash',
+        generationConfig: {
+          responseMimeType: 'application/json',
+          responseSchema: quizSchema,
+        },
+      });
+
+      const prompt = `You are an expert computer science educator. Generate exactly 4 multiple-choice quiz questions to test a student's understanding of the core concepts behind the following programming problem.
+
+Problem Title: "${problemTitle}"
+Tags/Topics: ${tags.join(', ')}
+Problem Description:
+${problemDescription}
+
+REQUIREMENTS:
+- Generate exactly 4 questions.
+- Each question must have exactly 4 answer options.
+- Focus on: time/space complexity, core algorithm choice, data structure rationale, edge cases, and optimization trade-offs.
+- Questions should be challenging but fair — test DEEP understanding, not just memorization.
+- Explanations must be educational and concise.
+- Do NOT ask questions that can be answered by simply reading the problem statement. Ask about WHY the approach works.`;
+
+      const result = await model.generateContent(prompt);
+      return JSON.parse(result.response.text()) as QuizQuestion[];
+    } catch (error) {
+      this.logger.error('Failed to generate flashcard quiz:', error);
+      throw new InternalServerErrorException(
+        'Failed to generate quiz. Please try again.',
+      );
     }
   }
 }

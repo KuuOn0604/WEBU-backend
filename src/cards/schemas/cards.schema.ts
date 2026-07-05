@@ -32,7 +32,7 @@ class IdeData {
   boilerplate_code!: BoilerplateCode;
   // theme, fontSize, defaultLanguage...
 }
-@Schema({ _id: false })
+
 // SCHEMA CHÍNH
 @Schema({
   collection: 'cards',
