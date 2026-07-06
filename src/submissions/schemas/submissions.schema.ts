@@ -37,6 +37,9 @@ export class Submission extends Document {
 
   @Prop()
   passed!: boolean;
+
+  @Prop({ type: String, default: '' })
+  note?: string;
 }
 
 export const SubmissionSchema = SchemaFactory.createForClass(Submission);

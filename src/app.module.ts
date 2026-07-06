@@ -11,6 +11,7 @@ import { CardsModule } from './cards/cards.module';
 import { FlashcardsModule } from './flashcards/flashcards.module';
 import { FsrsModule } from './fsrs/fsrs.module';
 import { Judge0Module } from './judge0/judge0.module';
+import { NotesModule } from './notes/notes.module';
 import { SubmissionsModule } from './submissions/submissions.module';
 import { TestCasesModule } from './test-cases/test-cases.module';
 import { UserProgressModule } from './user-progress/user-progress.module';
@@ -26,6 +27,7 @@ import { UsersModule } from './users/users.module';
     TestCasesModule,
     UserProgressModule,
     SubmissionsModule,
+    NotesModule,
     Judge0Module,
     FlashcardsModule,
     MongooseModule.forRootAsync({
@@ -52,6 +54,7 @@ import { UsersModule } from './users/users.module';
     AiModule,
     AuthModule,
     FsrsModule,
+    NotesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
