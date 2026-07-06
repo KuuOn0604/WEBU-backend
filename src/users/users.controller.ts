@@ -89,4 +89,12 @@ export class UsersController {
   ): Promise<FsrsProgressItem[]> {
     return this.usersService.getFsrsProgress(user.sub);
   }
+
+  // Danh sách ID bài tập đã làm
+  @Get('me/interacted-cards')
+  @UseGuards(JwtAuthGuard)
+  @ApiBearerAuth()
+  getInteractedCards(@CurrentUser() user: JwtPayload): Promise<string[]> {
+    return this.usersService.getInteractedCards(user.sub);
+  }
 }

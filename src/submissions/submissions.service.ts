@@ -217,14 +217,27 @@ export class SubmissionsService {
     cardId: string,
     userId: string,
   ): Promise<Submission[]> {
-    return this.submissionModel
+    const submissions = await this.submissionModel
       .find({
-        card_id: cardId,
-        user_id: userId,
+        card_id: new Types.ObjectId(cardId),
+        user_id: new Types.ObjectId(userId),
       })
       .sort({ submitted_at: -1 })
       .limit(20)
+      .lean()
       .exec();
+
+    return submissions.map((sub) => {
+      const doc = sub as unknown as {
+        _id: Types.ObjectId;
+        [key: string]: unknown;
+      };
+      const { _id, ...rest } = doc;
+      return {
+        ...rest,
+        id: _id.toString(),
+      } as unknown as Submission;
+    });
   }
 
   // ── CRUD cũ ──────────────────────────────────────────────────────────────

@@ -387,6 +387,20 @@ export class UsersService {
     return this.userProgressService.getFsrsProgressList(userId);
   }
 
+  /**
+   * Lấy danh sách ID các bài tập người dùng đã làm (đã submit)
+   */
+  async getInteractedCards(userId: string): Promise<string[]> {
+    const userObjId = new Types.ObjectId(userId);
+    const userIdFilter = { $in: [userObjId, userId] };
+    const submissions = await this.submissionModel
+      .find({ user_id: userIdFilter })
+      .select('card_id')
+      .exec();
+    const ids = new Set(submissions.map((s) => s.card_id.toString()));
+    return Array.from(ids);
+  }
+
   /** Tính streak từ mảng ngày có submission */
   private calculateStreaks(dates: string[]): {
     current_streak: number;
