@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
@@ -160,5 +164,24 @@ export class CardsService {
       ...cardJson,
       public_test_cases,
     };
+  }
+
+  async remove(id: string, userId: string): Promise<void> {
+    const card = await this.cardModel.findById(id).exec();
+    if (!card) {
+      throw new NotFoundException('Không tìm thấy bài tập để xóa');
+    }
+
+    if (!card.created_by || card.created_by.toString() !== userId) {
+      throw new ForbiddenException('Bạn không có quyền xóa bài tập này');
+    }
+
+    await this.cardModel.findByIdAndDelete(id).exec();
+    await this.testCaseModel
+      .deleteMany({ card_id: new Types.ObjectId(id) })
+      .exec();
+    await this.submissionModel
+      .deleteMany({ card_id: new Types.ObjectId(id) })
+      .exec();
   }
 }

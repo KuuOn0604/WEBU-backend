@@ -1,6 +1,7 @@
 import {
   Body,
   Controller,
+  Delete,
   Get,
   Headers,
   Param,
@@ -80,5 +81,15 @@ export class CardsController {
   @Get(':id')
   findOne(@Param('id') id: string): Promise<unknown> {
     return this.cardsService.findOne(id);
+  }
+
+  @Delete(':id')
+  @UseGuards(JwtAuthGuard)
+  async remove(
+    @Param('id') id: string,
+    @CurrentUser() user: JwtPayload,
+  ): Promise<{ success: boolean }> {
+    await this.cardsService.remove(id, user.sub);
+    return { success: true };
   }
 }
