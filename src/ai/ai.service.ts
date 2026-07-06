@@ -118,7 +118,8 @@ export class AiService {
         '1. For ALL languages (cpp, java, python, typescript): The boilerplate code MUST be a complete, fully runnable program template.\n' +
         '2. It MUST include all necessary imports/includes, the core solution logic class/method, and a complete main function (or entry point) that automatically reads inputs from standard input (stdin) matching the testcase format, parses them into correct types, calls the solution method, and prints the exact expected output to standard output (stdout).\n' +
         '3. Inside the solution method, mark the region where the user should write their code with a concise and professional comment: "// TODO: Implement your solution here" (or equivalent syntax for python/other languages).\n' +
-        '4. LANGUAGE SPECIFIC VERSIONS AND RULES:\n' +
+        '4. CRITICAL: DO NOT solve the problem or generate the working algorithm code. The body of the solution method/class MUST be empty except for the "// TODO" comment and a simple default/dummy return statement (e.g., return 0, return false, return empty list/string) to ensure compiling succeeds. Never write Kadane\'s algorithm, search algorithms, DP state transitions, math formulas, sorting, or any working logic inside the solution method. The logic inside the solution method must remain unsolved.\n' +
+        '5. LANGUAGE SPECIFIC VERSIONS AND RULES:\n' +
         '   - cpp: Generate C++20 boilerplate.\n' +
         '   - java: Generate Java 17 boilerplate.\n' +
         '   - python: Generate Python 3 boilerplate.\n' +
