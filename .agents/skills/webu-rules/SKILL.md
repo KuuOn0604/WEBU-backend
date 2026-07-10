@@ -5,7 +5,6 @@ Tài liệu này tổng hợp toàn bộ các quy chuẩn phát triển phần m
 ---
 
 ## I. QUY CHUẨN BACKEND (BE)
-
 ### 1. Đặt tên file & thư mục (Kebab-Case)
 > [!IMPORTANT]
 > Vi phạm quy tắc này sẽ gây ra lỗi Build hoặc Lint (Error).
