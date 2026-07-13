@@ -76,8 +76,7 @@ export class CardsService {
       query.tags = { $in: tags.split(',') };
     }
     if (difficulty_level) {
-      query.difficulty_level =
-        difficulty_level.toLowerCase() as DifficultyLevel;
+      query.difficulty_level = difficulty_level.toLowerCase();
     }
     if (search) {
       query.title = { $regex: search, $options: 'i' };

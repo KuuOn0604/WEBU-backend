@@ -297,7 +297,7 @@ export class UserProgressService {
               2: 'review',
               3: 'relearning',
             };
-            return stateMap[p.state as number] || 'new';
+            return stateMap[p.state] || 'new';
           })(),
           reps: p.reps,
           lapses: p.lapses,
