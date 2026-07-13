@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
+import type { Card } from 'ts-fsrs';
 
 import { LastRating } from '../common/enums/last-rating.enum';
 import { State } from '../common/enums/state.enum';
@@ -27,8 +28,8 @@ export class FsrsService {
       card_id: new Types.ObjectId(cardId),
     });
 
-    const currentFsrsCard = progress
-      ? {
+    const currentFsrsCard: Card = progress
+      ? ({
           due: progress.next_review_date || now,
           state: progress.state,
           difficulty: progress.difficulty || 0,
@@ -39,7 +40,7 @@ export class FsrsService {
           scheduled_days: progress.scheduled_days || 0,
           elapsed_days: 0,
           learning_steps: 0,
-        }
+        } as Card)
       : createEmptyCard();
 
     let rating = Rating.Again;

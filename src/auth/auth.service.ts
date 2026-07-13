@@ -1,6 +1,7 @@
 import {
   BadRequestException,
   Injectable,
+  InternalServerErrorException,
   UnauthorizedException,
 } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
@@ -96,7 +97,12 @@ export class AuthService {
       role: user.role,
     };
 
-    const token = await this.jwtService.signAsync(payload);
+    let token: string;
+    try {
+      token = await this.jwtService.signAsync(payload);
+    } catch {
+      throw new InternalServerErrorException('Lỗi tạo token xác thực');
+    }
 
     return {
       token,
@@ -171,7 +177,12 @@ export class AuthService {
         email: existingByGoogle.email,
         role: existingByGoogle.role,
       };
-      const token = await this.jwtService.signAsync(tokenPayload);
+      let token: string;
+      try {
+        token = await this.jwtService.signAsync(tokenPayload);
+      } catch {
+        throw new InternalServerErrorException('Lỗi tạo token xác thực');
+      }
       return {
         token,
         expires_in: 43200,
@@ -217,7 +228,12 @@ export class AuthService {
         email: existingByEmail.email,
         role: existingByEmail.role,
       };
-      const token = await this.jwtService.signAsync(tokenPayload);
+      let token: string;
+      try {
+        token = await this.jwtService.signAsync(tokenPayload);
+      } catch {
+        throw new InternalServerErrorException('Lỗi tạo token xác thực');
+      }
       return {
         token,
         expires_in: 43200,
@@ -245,7 +261,12 @@ export class AuthService {
       email: newUser.email,
       role: newUser.role,
     };
-    const token = await this.jwtService.signAsync(tokenPayload);
+    let token: string;
+    try {
+      token = await this.jwtService.signAsync(tokenPayload);
+    } catch {
+      throw new InternalServerErrorException('Lỗi tạo token xác thực');
+    }
     return {
       token,
       expires_in: 43200,

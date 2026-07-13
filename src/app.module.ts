@@ -54,7 +54,6 @@ import { UsersModule } from './users/users.module';
     AiModule,
     AuthModule,
     FsrsModule,
-    NotesModule,
   ],
   controllers: [AppController],
   providers: [AppService],
