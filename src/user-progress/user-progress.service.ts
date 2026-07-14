@@ -88,7 +88,6 @@ export class UserProgressService {
   > {
     const now = new Date();
 
-    // Tìm các task đến hạn ôn tập hoặc trạng thái mới
     let progressList = await this.userProgressModel
       .find({
         user_id: new Types.ObjectId(userId),
@@ -97,7 +96,6 @@ export class UserProgressService {
       .populate('card_id')
       .exec();
 
-    // Nếu người dùng chưa có progress nào, lấy tối đa 5 thẻ mới để gán ôn tập
     if (progressList.length === 0) {
       const existingProgress = await this.userProgressModel
         .find({ user_id: new Types.ObjectId(userId) })
@@ -105,7 +103,6 @@ export class UserProgressService {
         .exec();
       const existingCardIds = existingProgress.map((p) => p.card_id.toString());
 
-      // Lấy các card chưa có progress
       const newCards = await this.cardModel
         .find({ _id: { $nin: existingCardIds } })
         .limit(5)
@@ -136,7 +133,7 @@ export class UserProgressService {
     }
 
     return progressList
-      .filter((p) => p.card_id) // Lọc bỏ nếu card_id không tồn tại (do db mồ côi)
+      .filter((p) => p.card_id)
       .map((p) => {
         const card = p.card_id as unknown as Card;
         const cardId = card._id.toString();
@@ -173,7 +170,6 @@ export class UserProgressService {
     let reps = progress.reps || 0;
     let lapses = progress.lapses || 0;
 
-    // Chuyển rating thành enum
     let lastRatingEnum: LastRating = LastRating.GOOD;
     if (rating === 'easy') lastRatingEnum = LastRating.EASY;
     if (rating === 'hard') lastRatingEnum = LastRating.HARD;

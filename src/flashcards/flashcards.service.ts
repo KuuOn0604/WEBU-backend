@@ -20,26 +20,22 @@ export class FlashcardsService {
    * Lấy quiz cho một card — tự sinh bằng AI nếu chưa có trong DB (cache-aside)
    */
   async getOrGenerateQuiz(cardId: string): Promise<FlashcardQuiz> {
-    // Kiểm tra cache
     const existing = await this.quizModel
       .findOne({ card_id: new Types.ObjectId(cardId) })
       .exec();
     if (existing) return existing;
 
-    // Lấy thông tin card để generate
     const card = await this.cardModel.findById(cardId).exec();
     if (!card) {
       throw new NotFoundException(`Không tìm thấy bài tập với ID: ${cardId}`);
     }
 
-    // Gọi AI để sinh quiz
     const rawQuestions = await this.aiService.generateFlashcardQuiz(
       card.title,
       card.content?.description ?? '',
       card.tags ?? [],
     );
 
-    // Lưu vào DB
     const quiz = new this.quizModel({
       card_id: new Types.ObjectId(cardId),
       questions: rawQuestions.map((q) => ({

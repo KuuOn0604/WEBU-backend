@@ -22,7 +22,6 @@ export interface Judge0Result {
   memory: number | null;
 }
 
-// Map từ language enum → Judge0 language_id
 export const LANGUAGE_ID_MAP: Record<string, number> = {
   python: 71, // Python 3
   cpp: 54, // C++ (GCC 9.2.0)
@@ -66,7 +65,6 @@ export class Judge0Service {
   async execute(submission: Judge0Submission): Promise<Judge0Result> {
     const languageId = submission.language_id;
 
-    // Submit code
     let submitToken: string;
     try {
       const submitRes = await this.client.post<{ token: string }>(
@@ -199,7 +197,6 @@ export class Judge0Service {
     }));
 
     try {
-      // Submit batch
       const batchRes = await this.client.post<{ token: string }[]>(
         '/submissions/batch',
         { submissions },
@@ -208,7 +205,6 @@ export class Judge0Service {
 
       const tokens = batchRes.data.map((r) => r.token);
 
-      // Poll all results
       return Promise.all(tokens.map((token) => this.pollResult(token)));
     } catch (err: unknown) {
       const status = (err as { response?: { status?: number } })?.response

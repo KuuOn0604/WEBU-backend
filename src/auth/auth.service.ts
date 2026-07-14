@@ -136,7 +136,6 @@ export class AuthService {
   }> {
     const { idToken, password } = googleLoginDto;
 
-    // Xác thực Google Token
     let payload: {
       sub: string;
       email: string;
@@ -168,7 +167,6 @@ export class AuthService {
 
     const { sub: googleId, email, name, picture } = payload;
 
-    // ── Nhánh A: googleId đã tồn tại → đăng nhập thẳng ─────────────────
     const existingByGoogle = await this.usersService.findByGoogleId(googleId);
     if (existingByGoogle) {
       const tokenPayload = {
@@ -195,15 +193,12 @@ export class AuthService {
       };
     }
 
-    // ── Nhánh B: email đã tồn tại, chưa liên kết Google ─────────────────
     const existingByEmail = await this.usersService.findByEmail(email);
     if (existingByEmail) {
-      // Branch B, step 1: chưa có password → yêu cầu password
       if (!password) {
         return { requirePassword: true, email };
       }
 
-      // Branch B, step 2: kiểm tra password rồi link
       if (!existingByEmail.password_hash) {
         throw new UnauthorizedException('Mật khẩu không đúng');
       }
@@ -215,7 +210,6 @@ export class AuthService {
         throw new UnauthorizedException('Mật khẩu không đúng');
       }
 
-      // Link googleId vào tài khoản hiện có
       await this.usersService.linkGoogleId(
         existingByEmail._id.toString(),
         googleId,
@@ -246,7 +240,6 @@ export class AuthService {
       };
     }
 
-    // ── Nhánh C: chưa có tài khoản → tạo mới ────────────────────────────
     const username = name ?? email.split('@')[0];
     const newUser = await this.usersService.create({
       username,

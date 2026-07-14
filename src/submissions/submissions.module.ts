@@ -3,6 +3,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 
+import { Card, CardSchema } from '../cards/schemas/cards.schema';
 import { Judge0Module } from '../judge0/judge0.module';
 import { TestCasesModule } from '../test-cases/test-cases.module';
 import { Submission, SubmissionSchema } from './schemas/submissions.schema';
@@ -13,6 +14,7 @@ import { SubmissionsService } from './submissions.service';
   imports: [
     MongooseModule.forFeature([
       { name: Submission.name, schema: SubmissionSchema },
+      { name: Card.name, schema: CardSchema },
     ]),
     Judge0Module,
     TestCasesModule,

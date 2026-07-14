@@ -202,7 +202,6 @@ export class UsersService {
       ])
       .exec();
 
-    // Streak calculation
     const { current_streak, longest_streak } = this.calculateStreaks(
       submission_history.map((s) => s.date),
     );
@@ -278,7 +277,6 @@ export class UsersService {
     // Support both ObjectId and legacy string user_id in submissions
     const userIdFilter = { $in: [userObjId, userId] };
 
-    // Lấy tất cả submissions của user, kèm card info
     const submissionsWithCards = await this.submissionModel
       .aggregate<{
         card_id: Types.ObjectId;
@@ -332,7 +330,6 @@ export class UsersService {
       retentionMap.set(p.card_id, retention);
     });
 
-    // Gom theo tag
     const tagStats = new Map<
       string,
       {

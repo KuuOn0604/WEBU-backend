@@ -116,6 +116,9 @@ export class CardsService {
       },
       ide_data: {
         boilerplate_code: createCardDto.boilerplate_code,
+        ...(createCardDto.hidden_wrappers && {
+          hidden_wrappers: createCardDto.hidden_wrappers,
+        }),
       },
       created_by: new Types.ObjectId(userId),
     });

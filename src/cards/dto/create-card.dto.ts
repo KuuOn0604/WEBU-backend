@@ -52,6 +52,15 @@ export class CreateCardDto {
 
   @ApiPropertyOptional()
   @IsOptional()
+  hidden_wrappers?: {
+    cpp?: string;
+    java?: string;
+    python?: string;
+    typescript?: string;
+  };
+
+  @ApiPropertyOptional()
+  @IsOptional()
   @IsArray()
   testcases?: Array<{
     input: string;

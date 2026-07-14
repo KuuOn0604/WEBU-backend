@@ -4,7 +4,6 @@ import { Document, Types } from 'mongoose';
 import { LearningMode } from '../../common/enums/learning-mode.enum';
 import { Role } from '../../common/enums/role.enum';
 
-// SCHEMA PHỤ
 @Schema({ _id: false })
 export class OnboardingSurvey {
   @Prop()
@@ -13,7 +12,6 @@ export class OnboardingSurvey {
   @Prop()
   goals!: string[];
 }
-// SCHEMA CHÍNH
 @Schema({
   collection: 'users',
   timestamps: { createdAt: 'created_at', updatedAt: false },

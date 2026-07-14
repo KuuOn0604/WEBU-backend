@@ -22,7 +22,6 @@ import { ExtendedStats, SkillStat, UsersService } from './users.service';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // Cấu hình onboarding cho user
   @Put('me/setup')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -37,7 +36,6 @@ export class UsersController {
     return this.usersService.updateSetup(user.sub, setupDto);
   }
 
-  // Lấy nhiệm vụ ôn tập hàng ngày
   @Get('me/daily-tasks')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -51,7 +49,6 @@ export class UsersController {
     return this.usersService.getDailyTasks(user.sub);
   }
 
-  // Đánh giá độ khó sau khi ôn tập
   @Post('me/daily-tasks/:card_id/review')
   @UseGuards(JwtAuthGuard)
   @HttpCode(200)
@@ -64,7 +61,6 @@ export class UsersController {
     return this.usersService.reviewCard(user.sub, cardId, reviewCardDto.rating);
   }
 
-  // Xem Dashboard thống kê mở rộng
   @Get('me/stats')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -72,7 +68,6 @@ export class UsersController {
     return this.usersService.getStats(user.sub);
   }
 
-  // Thống kê kỹ năng theo tag (Skill Radar Chart)
   @Get('me/skill-stats')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -80,7 +75,6 @@ export class UsersController {
     return this.usersService.getSkillStats(user.sub);
   }
 
-  // FSRS progress list (cho Statistics table)
   @Get('me/fsrs-progress')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
@@ -90,7 +84,6 @@ export class UsersController {
     return this.usersService.getFsrsProgress(user.sub);
   }
 
-  // Danh sách ID bài tập đã làm
   @Get('me/interacted-cards')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()

@@ -3,7 +3,6 @@ import { Document, Types } from 'mongoose';
 
 import { DifficultyLevel } from '../../common/enums/difficulty-level.enum';
 
-// SCHEMA PHỤ
 @Schema({ _id: false })
 class Content {
   @Prop({ required: true })
@@ -30,10 +29,11 @@ class BoilerplateCode {
 class IdeData {
   @Prop({ type: BoilerplateCode, required: true })
   boilerplate_code!: BoilerplateCode;
-  // theme, fontSize, defaultLanguage...
+
+  @Prop({ type: BoilerplateCode, required: false })
+  hidden_wrappers?: BoilerplateCode;
 }
 
-// SCHEMA CHÍNH
 @Schema({
   collection: 'cards',
   timestamps: { createdAt: false, updatedAt: 'updated_at' },

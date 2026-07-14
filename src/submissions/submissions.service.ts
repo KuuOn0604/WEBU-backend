@@ -2,11 +2,14 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model, Types } from 'mongoose';
 
+import { Card } from '../cards/schemas/cards.schema';
+import { Language } from '../common/enums/language.enum';
 import {
   Judge0Result,
   Judge0Service,
   LANGUAGE_ID_MAP,
 } from '../judge0/judge0.service';
+import { WrapperFactory } from '../judge0/wrappers/wrapper.factory';
 import { TestCase } from '../test-cases/schemas/test-cases.schema';
 import { CreateSubmissionDto } from './dto/create-submission.dto';
 import { RunCodeDto } from './dto/run-code.dto';
@@ -49,6 +52,8 @@ export class SubmissionsService {
     private readonly submissionModel: Model<Submission>,
     @InjectModel(TestCase.name)
     private readonly testCaseModel: Model<TestCase>,
+    @InjectModel(Card.name)
+    private readonly cardModel: Model<Card>,
     private readonly judge0Service: Judge0Service,
   ) {}
 
@@ -59,7 +64,6 @@ export class SubmissionsService {
     const { card_id, code, language } = dto;
     const languageId = LANGUAGE_ID_MAP[language] ?? 63;
 
-    // Lấy public test cases
     const testCases = await this.testCaseModel
       .find({ card_id: new Types.ObjectId(card_id), is_hidden: false })
       .sort({ order: 1 })
@@ -73,9 +77,64 @@ export class SubmissionsService {
       };
     }
 
-    // Chạy batch trên Judge0
-    const judge0Results = await this.judge0Service.executeBatch(
+    const card = await this.cardModel.findById(card_id).exec();
+    let wrapperTemplate =
+      card?.ide_data?.hidden_wrappers?.[
+        language as keyof typeof card.ide_data.hidden_wrappers
+      ];
+
+    // Fallback cho bài "Two Sum" C++ nếu Database chưa được cập nhật hidden_wrappers
+    if (
+      !wrapperTemplate &&
+      card?.title === 'Two Sum' &&
+      language === Language.CPP
+    ) {
+      wrapperTemplate = `#include <iostream>
+#include <vector>
+#include <string>
+#include <map>
+
+using namespace std;
+
+{{USER_CODE}}
+
+int main() {
+    string arrayStr;
+    if (!getline(cin, arrayStr)) return 0;
+    int target;
+    cin >> target;
+    
+    vector<int> nums;
+    string numStr = "";
+    for (char c : arrayStr) {
+        if (isdigit(c) || c == '-') {
+            numStr += c;
+        } else if (c == ',' || c == ']') {
+            if (!numStr.empty()) {
+                nums.push_back(stoi(numStr));
+                numStr = "";
+            }
+        }
+    }
+    
+    Solution obj;
+    vector<int> res = obj.twoSum(nums, target);
+    if (res.size() >= 2) {
+        cout << "[" << res[0] << ", " << res[1] << "]";
+    } else {
+        cout << "[]";
+    }
+    return 0;
+}`;
+    }
+
+    const { code: finalCode, lineOffset } = WrapperFactory.wrapCode(
       code,
+      wrapperTemplate || '',
+    );
+
+    const judge0Results = await this.judge0Service.executeBatch(
+      finalCode,
       languageId,
       testCases.map((tc) => ({
         input: tc.input,
@@ -89,6 +148,20 @@ export class SubmissionsService {
       const expectedOutput = tc.expected_output.trim();
       const passed = r.status.id === 3 && actualOutput === expectedOutput;
 
+      let errorMsg = r.stderr || r.compile_output || null;
+      if (errorMsg && lineOffset > 0) {
+        // Điều chỉnh số dòng trong thông báo lỗi (vd: line 55 -> line 5)
+        const regex = /:(\d+):(\d+):/g;
+        errorMsg = errorMsg.replace(
+          regex,
+          (match: string, line: string, col: string) => {
+            const originalLine = parseInt(line, 10);
+            const adjustedLine = Math.max(1, originalLine - lineOffset);
+            return `:${adjustedLine}:${col}:`;
+          },
+        );
+      }
+
       return {
         order: tc.order,
         input: tc.input,
@@ -97,7 +170,7 @@ export class SubmissionsService {
         passed,
         status: r.status.description,
         execution_time: r.time,
-        error: r.stderr || r.compile_output || null,
+        error: errorMsg,
       };
     });
 
@@ -118,7 +191,6 @@ export class SubmissionsService {
     const { card_id, submitted_code, language } = dto;
     const languageId = LANGUAGE_ID_MAP[language] ?? 63;
 
-    // Lấy tất cả test cases (public + hidden)
     const testCases = await this.testCaseModel
       .find({ card_id: new Types.ObjectId(card_id) })
       .sort({ order: 1 })
@@ -128,9 +200,64 @@ export class SubmissionsService {
       throw new NotFoundException('Không có test case nào cho bài tập này');
     }
 
-    // Chạy batch trên Judge0
-    const judge0Results = await this.judge0Service.executeBatch(
+    const card = await this.cardModel.findById(card_id).exec();
+    let wrapperTemplate =
+      card?.ide_data?.hidden_wrappers?.[
+        language as keyof typeof card.ide_data.hidden_wrappers
+      ];
+
+    // Fallback cho bài "Two Sum" C++ nếu Database chưa được cập nhật hidden_wrappers
+    if (
+      !wrapperTemplate &&
+      card?.title === 'Two Sum' &&
+      language === Language.CPP
+    ) {
+      wrapperTemplate = `#include <iostream>
+#include <vector>
+#include <string>
+#include <map>
+
+using namespace std;
+
+{{USER_CODE}}
+
+int main() {
+    string arrayStr;
+    if (!getline(cin, arrayStr)) return 0;
+    int target;
+    cin >> target;
+    
+    vector<int> nums;
+    string numStr = "";
+    for (char c : arrayStr) {
+        if (isdigit(c) || c == '-') {
+            numStr += c;
+        } else if (c == ',' || c == ']') {
+            if (!numStr.empty()) {
+                nums.push_back(stoi(numStr));
+                numStr = "";
+            }
+        }
+    }
+    
+    Solution obj;
+    vector<int> res = obj.twoSum(nums, target);
+    if (res.size() >= 2) {
+        cout << "[" << res[0] << ", " << res[1] << "]";
+    } else {
+        cout << "[]";
+    }
+    return 0;
+}`;
+    }
+
+    const { code: finalCode, lineOffset } = WrapperFactory.wrapCode(
       submitted_code,
+      wrapperTemplate || '',
+    );
+
+    const judge0Results = await this.judge0Service.executeBatch(
+      finalCode,
       languageId,
       testCases.map((tc) => ({
         input: tc.input,
@@ -144,6 +271,20 @@ export class SubmissionsService {
       const expectedOutput = tc.expected_output.trim();
       const passed = r.status.id === 3 && actualOutput === expectedOutput;
 
+      let errorMsg = r.stderr || r.compile_output || null;
+      if (errorMsg && lineOffset > 0) {
+        // Điều chỉnh số dòng trong thông báo lỗi
+        const regex = /:(\d+):(\d+):/g;
+        errorMsg = errorMsg.replace(
+          regex,
+          (match: string, line: string, col: string) => {
+            const originalLine = parseInt(line, 10);
+            const adjustedLine = Math.max(1, originalLine - lineOffset);
+            return `:${adjustedLine}:${col}:`;
+          },
+        );
+      }
+
       return {
         order: tc.order,
         input: tc.input,
@@ -152,14 +293,13 @@ export class SubmissionsService {
         passed,
         status: r.status.description,
         execution_time: r.time,
-        error: r.stderr || r.compile_output || null,
+        error: errorMsg,
       };
     });
 
     const passedCount = results.filter((r) => r.passed).length;
     const allPassed = passedCount === results.length;
 
-    // Tính average execution time và max memory
     const times = judge0Results
       .map((r) => parseFloat(r.time ?? '0'))
       .filter((t) => !isNaN(t));
@@ -169,10 +309,8 @@ export class SubmissionsService {
         : null;
     const maxMemory = Math.max(...judge0Results.map((r) => r.memory ?? 0));
 
-    // Lấy lỗi đầu tiên nếu có
     const firstError = results.find((r) => r.error)?.error ?? null;
 
-    // Xác định status
     let status = 'Accepted';
     if (!allPassed) {
       const hasCompileError = judge0Results.some((r) => r.compile_output);
@@ -182,7 +320,6 @@ export class SubmissionsService {
       else status = 'Wrong Answer';
     }
 
-    // Lưu vào DB
     const submission = new this.submissionModel({
       user_id: new Types.ObjectId(userId),
       card_id: new Types.ObjectId(card_id),
@@ -239,8 +376,6 @@ export class SubmissionsService {
       } as unknown as Submission;
     });
   }
-
-  // ── CRUD cũ ──────────────────────────────────────────────────────────────
 
   async create(createSubmissionDto: CreateSubmissionDto): Promise<Submission> {
     const createdSubmission = new this.submissionModel(createSubmissionDto);
