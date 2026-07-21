@@ -88,12 +88,13 @@ export class FsrsService {
   }
 
   async getDueReviews(userId: string): Promise<UserProgress[]> {
-    const now = new Date();
     return this.progressModel
       .find({
         user_id: new Types.ObjectId(userId),
-        next_review_date: { $lte: now },
+        state: { $ne: State.NEW },
+        next_review_date: { $exists: true, $ne: null },
       })
+      .sort({ next_review_date: 1 })
       .populate('card_id');
   }
 }
