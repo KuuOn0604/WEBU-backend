@@ -88,11 +88,19 @@ export class FsrsService {
   }
 
   async getDueReviews(userId: string): Promise<UserProgress[]> {
+    const now = new Date();
     return this.progressModel
       .find({
         user_id: new Types.ObjectId(userId),
-        state: { $ne: State.NEW },
-        next_review_date: { $exists: true, $ne: null },
+        $or: [
+          // Cards that have been reviewed and are now due
+          {
+            state: { $ne: State.NEW },
+            next_review_date: { $lte: now },
+          },
+          // Cards in NEW state (never reviewed) always show up for review
+          { state: State.NEW },
+        ],
       })
       .sort({ next_review_date: 1 })
       .populate('card_id');
